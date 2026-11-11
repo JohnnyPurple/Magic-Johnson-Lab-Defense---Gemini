@@ -1,0 +1,2289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Magic Johnson Lab Defense: Outbreak of Zombie Terri</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #060b14;
+      color: #e2e8f0;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    .bio-glow { box-shadow: 0 0 18px rgba(16, 185, 129, 0.25); }
+    .gold-glow { box-shadow: 0 0 18px rgba(245, 158, 11, 0.3); }
+    .danger-glow { box-shadow: 0 0 22px rgba(239, 68, 68, 0.45); }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #10b981; }
+    @keyframes pulse-border {
+      0%, 100% { border-color: rgba(16, 185, 129, 0.5); }
+      50% { border-color: rgba(16, 185, 129, 1); }
+    }
+    .pulse-ring { animation: pulse-border 2s infinite; }
+    canvas { touch-action: none; cursor: crosshair; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-950 text-slate-100">
+
+  <!-- TOP NAVIGATION & LAB TELEMETRY BAR -->
+  <header class="bg-slate-900/95 border-b border-emerald-500/30 px-3 py-2 sticky top-0 z-30 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+      <!-- Brand Title -->
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-lg bg-emerald-500/20 border border-emerald-400/50 flex items-center justify-center text-xl shadow-inner">
+          ☣️
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-black tracking-tight text-sm sm:text-base text-emerald-400 uppercase">Magic Johnson Lab Defense</h1>
+            <span class="hidden sm:inline-block text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">Bond LSC • BSL-3</span>
+          </div>
+          <p class="text-[11px] text-slate-400 hidden md:block">Operation: Stop the 8 Strains of Zombie Terri from Auditing the Lab</p>
+        </div>
+      </div>
+
+      <!-- Live Telemetry Metrics -->
+      <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+        <!-- Grant Money -->
+        <div class="bg-slate-950/90 border border-amber-500/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5 gold-glow">
+          <span class="text-base">💰</span>
+          <div>
+            <div class="text-[9px] uppercase tracking-wider text-amber-300/80 font-semibold">NIH Grant Cash</div>
+            <div id="hudMoney" class="mono font-bold text-sm sm:text-base text-amber-400">$150</div>
+          </div>
+        </div>
+
+        <!-- Wave / Level -->
+        <div class="bg-slate-950/90 border border-cyan-500/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5">
+          <span class="text-base">🧬</span>
+          <div>
+            <div class="text-[9px] uppercase tracking-wider text-cyan-300/80 font-semibold">Outbreak Wave</div>
+            <div class="flex items-baseline gap-1">
+              <span id="hudWave" class="mono font-bold text-sm sm:text-base text-cyan-400">LVL 1</span>
+              <span id="hudWaveProg" class="text-[10px] mono text-slate-400">(0/6)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lab Integrity -->
+        <div class="bg-slate-950/90 border border-emerald-500/40 rounded-lg px-2.5 py-1 flex items-center gap-1.5">
+          <span class="text-base">🛡️</span>
+          <div class="w-24 sm:w-32">
+            <div class="flex justify-between text-[9px] uppercase tracking-wider font-semibold">
+              <span class="text-emerald-300/90">Lab Containment</span>
+              <span id="hudHpText" class="mono text-emerald-400">100/100</span>
+            </div>
+            <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden mt-0.5">
+              <div id="hudHpBar" class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-200" style="width: 100%"></div>
+            </div>
+            <div id="hudShieldBarWrap" class="w-full h-1 bg-slate-800 rounded-full overflow-hidden mt-0.5 hidden">
+              <div id="hudShieldBar" class="h-full bg-cyan-400 transition-all duration-200" style="width: 100%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Score / Kills -->
+        <div class="hidden lg:flex bg-slate-950/90 border border-purple-500/40 rounded-lg px-2.5 py-1 items-center gap-1.5">
+          <span class="text-base">🧟‍♀️</span>
+          <div>
+            <div class="text-[9px] uppercase tracking-wider text-purple-300/80 font-semibold">Terris Cured</div>
+            <div id="hudKills" class="mono font-bold text-sm text-purple-300">0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="flex items-center gap-1.5">
+        <button id="btnStartWave" class="px-3 py-1.5 rounded-lg font-bold text-xs uppercase tracking-wider bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow-lg shadow-emerald-500/20 transition flex items-center gap-1 cursor-pointer">
+          <span>▶</span> <span id="btnStartWaveText">Start Wave 1</span>
+        </button>
+        <button id="btnAutoWave" class="px-2.5 py-1.5 rounded-lg font-semibold text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition cursor-pointer" title="Toggle Auto-Advance Waves">
+          Auto: OFF
+        </button>
+        <button id="btnSpeed" class="px-2.5 py-1.5 rounded-lg font-semibold text-xs mono bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 transition cursor-pointer" title="Toggle Game Simulation Speed">
+          1x
+        </button>
+        <button id="btnPause" class="px-2.5 py-1.5 rounded-lg font-semibold text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition cursor-pointer">
+          ⏸️
+        </button>
+        <button id="btnMute" class="px-2.5 py-1.5 rounded-lg font-semibold text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition cursor-pointer" title="Mute / Unmute Synthesizer SFX">
+          🔊
+        </button>
+        <button id="btnCodex" class="px-2.5 py-1.5 rounded-lg font-semibold text-xs bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 border border-purple-400/40 transition cursor-pointer">
+          📖 Strain Codex
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN WORKSPACE GRID -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-2 sm:p-3 grid grid-cols-1 lg:grid-cols-12 gap-3 items-start">
+
+    <!-- LEFT / CENTER COLUMN: ARENA CANVAS + ACTIVE SKILLS & QUICK WEAPON BAR -->
+    <div class="lg:col-span-8 flex flex-col gap-2.5">
+
+      <!-- Interactive Canvas Container -->
+      <div class="relative rounded-xl overflow-hidden border-2 border-slate-800 bg-slate-900 shadow-2xl">
+        <!-- Top Floating Banner inside Arena -->
+        <div class="absolute top-2 left-2 right-2 flex items-center justify-between pointer-events-none z-10">
+          <div id="activeWeaponBadge" class="bg-slate-950/85 border border-emerald-500/40 px-2.5 py-1 rounded-lg text-xs flex items-center gap-2 backdrop-blur-sm">
+            <span id="activeWeaponIcon" class="text-base">🧪</span>
+            <div>
+              <span id="activeWeaponName" class="font-bold text-emerald-300">Eppendorf Multipette M4</span>
+              <span id="activeWeaponStats" class="text-[10px] mono text-slate-400 ml-1.5">DMG: 22 • Rate: 3.5/s</span>
+            </div>
+          </div>
+          <div id="waveAnnouncement" class="hidden bg-red-950/90 border border-red-500/60 px-3 py-1 rounded-lg text-xs font-bold text-red-200 uppercase tracking-wider animate-pulse">
+            ⚠️ Biohazard Wave Incoming!
+          </div>
+        </div>
+
+        <canvas id="gameCanvas" width="840" height="460" class="w-full h-auto block"></canvas>
+
+        <!-- Bottom Floating Controls & Active Emergency Skills Bar -->
+        <div class="bg-slate-900/95 border-t border-slate-800 px-3 py-2 flex flex-wrap items-center justify-between gap-2">
+          <!-- Equipped Handheld Weapon Quick-Switch -->
+          <div class="flex items-center gap-1 overflow-x-auto pb-0.5" id="quickWeaponBar">
+            <!-- Populated dynamically -->
+          </div>
+
+          <!-- Active Lab Emergency Skills -->
+          <div class="flex items-center gap-1.5">
+            <span class="text-[10px] uppercase tracking-wider text-slate-400 font-bold mr-1 hidden sm:inline">Emergency Protocols:</span>
+            <button id="skillAutoclave" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-orange-500/20 hover:bg-orange-500/30 border border-orange-500/50 text-orange-300 transition flex items-center gap-1 cursor-pointer">
+              <span>♨️</span> <span>Autoclave Vent</span> <span id="cdAutoclave" class="mono text-[10px] text-orange-200">($75)</span>
+            </button>
+            <button id="skillCaffeine" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/50 text-amber-300 transition flex items-center gap-1 cursor-pointer">
+              <span>☕</span> <span>Espresso Overdrive</span> <span id="cdCaffeine" class="mono text-[10px] text-amber-200">($60)</span>
+            </button>
+            <button id="skillBleach" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/50 text-cyan-300 transition flex items-center gap-1 cursor-pointer">
+              <span>🧼</span> <span>10% Bleach Flood</span> <span id="cdBleach" class="mono text-[10px] text-cyan-200">($120)</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Milestone Level Unlock Progress Ribbon -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-2.5">
+        <div class="flex items-center justify-between mb-1.5">
+          <div class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+            <span>🔓</span> <span>Science Lab Clearance Progression (Unlocks Every Few Waves & Global +8% Stat Scaling/Wave)</span>
+          </div>
+          <span id="globalScalingBadge" class="text-[11px] mono text-cyan-300 bg-cyan-950/60 border border-cyan-500/30 px-2 py-0.5 rounded">Lab Tech Mastery: +0% DMG</span>
+        </div>
+        <div id="milestoneTrack" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-1.5 text-[10px]">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: SCIENCE ARMORY, TURRET BUILDER & LAB FORTIFICATIONS -->
+    <div class="lg:col-span-4 bg-slate-900/95 border border-slate-800 rounded-xl flex flex-col overflow-hidden shadow-xl max-h-[640px]">
+      <!-- Shop Category Tabs -->
+      <div class="grid grid-cols-3 border-b border-slate-800 bg-slate-950/60 text-xs font-bold">
+        <button id="tabBtnWeapons" class="py-2.5 px-2 text-center border-b-2 border-emerald-400 text-emerald-300 bg-emerald-500/10 transition cursor-pointer">
+          🔫 Lab Weapons (8)
+        </button>
+        <button id="tabBtnTurrets" class="py-2.5 px-2 text-center border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition cursor-pointer">
+          ⚡ Auto-Turrets (6)
+        </button>
+        <button id="tabBtnLab" class="py-2.5 px-2 text-center border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition cursor-pointer">
+          🏰 Fortify Lab (6)
+        </button>
+      </div>
+
+      <!-- Tab Subheader -->
+      <div id="shopSubheader" class="px-3 py-2 bg-slate-950/40 border-b border-slate-800/80 text-[11px] text-slate-400 flex items-center justify-between">
+        <span>Aim & hold click on the lab floor to fire your equipped handheld science weapon!</span>
+      </div>
+
+      <!-- Scrollable List Container -->
+      <div id="shopListContainer" class="p-2.5 overflow-y-auto space-y-2 flex-1">
+        <!-- Populated dynamically by JS -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MODAL: ZOMBIE TERRI STRAIN CODEX & MILESTONE GUIDE -->
+  <div id="codexModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 hidden items-center justify-center p-3">
+    <div class="bg-slate-900 border-2 border-emerald-500/50 rounded-2xl max-w-4xl w-full max-h-[88vh] flex flex-col overflow-hidden shadow-2xl">
+      <div class="px-4 py-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">🧟‍♀️</span>
+          <div>
+            <h2 class="font-black text-base sm:text-lg text-emerald-400 uppercase">Bond LSC Biohazard Codex: The 8 Strains of Zombie Terri</h2>
+            <p class="text-xs text-slate-400">Every photo of Terri has mutated into a distinct laboratory hazard trying to breach the Magic Johnson Lab!</p>
+          </div>
+        </div>
+        <button id="btnCloseCodex" class="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs cursor-pointer">✕ Close</button>
+      </div>
+      <div id="codexGrid" class="p-4 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <!-- Populated dynamically with actual Terri photos & stats -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: MILESTONE UNLOCK CELEBRATION TOAST / POPUP -->
+  <div id="unlockToast" class="fixed bottom-4 right-4 z-40 hidden bg-slate-900/95 border-2 border-amber-400 rounded-xl p-3 shadow-2xl max-w-sm gold-glow">
+    <div class="flex items-start gap-3">
+      <div id="unlockToastIcon" class="text-3xl bg-amber-500/20 border border-amber-400/50 rounded-lg p-2">🎉</div>
+      <div class="flex-1">
+        <div class="text-[10px] font-black uppercase tracking-wider text-amber-400">New Science Tech Unlocked!</div>
+        <div id="unlockToastTitle" class="font-bold text-sm text-white mt-0.5">QIAcube Automated Turret</div>
+        <div id="unlockToastDesc" class="text-xs text-slate-300 mt-0.5">Unlocked at Wave 5! Check your Armory & Turrets tab.</div>
+      </div>
+      <button id="btnCloseToast" class="text-slate-400 hover:text-white text-xs font-bold cursor-pointer">✕</button>
+    </div>
+  </div>
+
+  <!-- MODAL: GAME OVER / LAB BREACHED -->
+  <div id="gameOverModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 hidden items-center justify-center p-4">
+    <div class="bg-slate-900 border-2 border-red-500 rounded-2xl max-w-md w-full p-5 text-center danger-glow">
+      <div class="text-5xl mb-2">☣️</div>
+      <h2 class="text-2xl font-black text-red-400 uppercase tracking-tight">Magic Johnson Lab Breached!</h2>
+      <p id="gameOverReason" class="text-xs text-slate-300 mt-1">Zombie Terri confiscated all unmarked 1.5mL tubes and shut down the incubators!</p>
+      <div class="my-4 bg-slate-950 border border-slate-800 rounded-xl p-3 grid grid-cols-2 gap-2 text-left">
+        <div>
+          <div class="text-[10px] text-slate-400 uppercase">Highest Outbreak Wave</div>
+          <div id="goWave" class="mono font-bold text-lg text-cyan-400">Wave 1</div>
+        </div>
+        <div>
+          <div class="text-[10px] text-slate-400 uppercase">Zombie Terris Cured</div>
+          <div id="goKills" class="mono font-bold text-lg text-purple-400">0</div>
+        </div>
+      </div>
+      <div class="flex gap-2 justify-center">
+        <button id="btnRetryWave" class="flex-1 py-2.5 px-4 rounded-xl font-bold text-xs uppercase bg-amber-500 hover:bg-amber-400 text-slate-950 transition cursor-pointer">
+          🔄 Retry Current Wave (Keep Gear)
+        </button>
+        <button id="btnRestartGame" class="py-2.5 px-4 rounded-xl font-bold text-xs uppercase bg-slate-800 hover:bg-slate-700 text-slate-200 transition cursor-pointer">
+          New Grant Run
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /***********************************************************************
+     * 1. EMBEDDED TERRI ZOMBIE SPRITE IMAGES (INLINED AT BUILD TIME)
+     ***********************************************************************/
+    const TERRI_SPRITE_PATHS = {
+      chair: "data:image/jpeg;base64,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",
+      lab: "data:image/jpeg;base64,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",
+      bond: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBAUEBAYFBQUGBgYHCQ4JCQgICRINDQoOFRIWFhUSFBQXGiEcFxgfGRQUHScdHyIjJSUlFhwpLCgkKyEkJST/2wBDAQYGBgkICREJCREkGBQYJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCT/wAARCACgAKADASIAAhEBAxEB/8QAHQAAAgMBAQEBAQAAAAAAAAAABgcEBQgDAgEACf/EAEMQAAIBAwIDBQcBBQQIBwAAAAECAwQFEQAhBhIxBxNBUWEUIjJxgZGhQhUjUrHRYnLB8AgzQ2OSorLhFiQ0dIKD8f/EABoBAAMBAQEBAAAAAAAAAAAAAAIDBAUBAAb/xAArEQACAgICAgEDAwQDAAAAAAABAgADBBESITFBUQUTYRQiMiNxgfBCkaH/2gAMAwEAAhEDEQA/AHpW01yVu9iuE5ib4SHO2u1LSXCRARXzk/3zqDapay0RrS17e0U3wrIP0/P01Ojp6pagtDVYp2+HbONAIMkPRVkIDT3KRV/vnX6Oumj9ymaadvF2Yka6rQIx5pneVh/Edtd1VUGFAA9NdnZVz0VxrJFkluE6Y6JG5Vfx118no69EytfUZH+8OrbI1Avl6t9it0tfcqmOmpohu7eJ8AB4k+Q17U9IVDUV8dR3clXK6+rHbU+qSSVcioqFP9lzpB8V9utUatlsUK0cQO0soDyt9Og/J0E3PtK4luGWqLxcXzn3TOUX5YXQ7+IQU+5pqvkuJx3VTWAL1IZtcEqK2YEPW1i/KQjWU/8AxteKZllNXUqV8RUOPznRTQdtnFq2rkhqlZac87yugeTk6YyeoB9PHQqpENjvWpounhrXQrHVVmT+ppWJ1NWGuiVVetqMj+2dJngn/SKqWKw3+jjnh6GqphyunqU6EfLfTlhuqXikiraCSOemlXmSRDkEf58NGD6i235gTxZXXqlu0SUlwuDBxukcjY0e2KoqjbYnqZ5hJyjPOxzoX4o4kTh6MSyQd67HA3A0F1HatVTRmGKIqzHACZx/U6pxsO29v2CXYP02/LbjWOo0r5xbS2qMhqo84Hwht9RrTJcr7/5mWoqoYCPcUOVyPM6GuEOD6i7Spc7wpOTzJE3h6kaZUUKwoEQAAeWmZCJT+xTsxmXXTjf06ztvZ9f4g/LQ3O1VBqKevqZYW3aOSQsB8s6uLdcHq0yZXDDqCdSnQOhBGc6r6VFhnYAYyempi3LzIHs5eZagyH/aP99S6Qko2STv46ixnI1Lpfgb565AmerP2n1NitVsa+SiRqxebkb4lGP6Y0y+HeLLXdaUGmnQqdwudxrIfaPexdeIT3LEU9KghiHTBHX8/wAtS+z/AIuqKO6RUtRVOkbnCvnodTAkQynU2lDMJUyDnXvOllZeNai2vHFX5khbHLMo2+umDb7nTXKESQSK6nfY6arhvEUep2q6yGhppaqolSKCFC8kjHAVQMknWVO0/tNm41u8ixO6W6nYrTxHbA/iP9o/jpo9/wBIrj80FMvC9FKRJIgmqyp6Ln3E+vU/TWd++bO3vHPvHzOhY7Maq9blvz8wBBxt9T/T565LQ1NYOZR3UA6yMcA/I9W1L4Ws1ZxLWiCkjLjI52bZQPX+mnbZuy+2U8SS17NVOq45eifbXGsVejHJSz9iJWi4RrLmwSjE85JwTHGSv30T0fZ9cLNYrpJWUaq5h9wnpnPl8s60FbrbR0NOkVNBHEg8EUDGudxpIquGSGRQysMb6A3fEauMPBmSaZVo4gZAVYHqDuP/AM0xOzbtKrOEK000kxmttR70kYOQv9tfI6rO1PhWSy1Jq6ZMRMcMANhpf0d0WkkVScIDzKfL+IfLTAdjYiCvBtGabv1lm4kVKw3ATQuOeML8OD46ndnnAlElW9VUhZpY290HcLoQ7L+IBWWqqtErESwoZack+Hiv+P30xuz6oKzzKzdSDudV/rrNcFOhKrPqV4HBDofiH8aLEoRQAB5a964tURqeuflr4asHcKTpO5m7knw1VAn2p/Iamx1aOSnQ6r4JDJWzLjodEvYM4Zb0z8y6n0vwH56qaeTkbB1a0ZzGfnoROz+ddZHJVwidVZ2JyxxqCglhIkAZSDkH10WUshgtzwiNeYDOh64XJnhMRiAGc5xqNLC3Woa2Fj46j97IOKYL7bEpqwCSaAcrK3UjR/UQPwzFUXm3yH2KJDLLBnYAbnHlrL3ZjxLLYuJqdhnkmbkI89PTtS4nNv4GlpInCyXBlhAzuF+Jv5fnTCvU9rvQiJ4uv1TxLe6u51Ll5quYv1+EdFA9NV1voJrpXxUUB96VuXOOg8Tr8cDnlwPdGFHqdGPZVQCa6yzCleodBgYIHKPrrxOhuUInJgI4OBOFKSwWuKKniAYgFm8WOjGNSo5SNhoMt/FklPW+y1FvlpxjZuYEffRLQV4rDIUJOcgahJO+5rKo11LiDmZfdxga+VAOx9NCVZxJdKKTCwxRxAkM7n4dWFsuElbH3jXmCRxkmJFXH886PyIsjRkXiix097ts8E6g848R01lnjTh2o4cuEtO2eUMQjH+X21reQs+Q6jfy6aTPa7YRKHDL8SloyfH00zHfR4mT5de15CDfBV7loTRVyludFCtv19P560HwVVwVlejQNiKRA6/XWYOHp+a3rGD78YOR576b3ZpfpHRYFkIdBlD6eWqGPE7kBXYmj44IVA6HXvMS7ArpdftS7bYqsA+mvD191Iz7Y320o5iCdGOxjDKwqS/MudRadIzUvIGGgFa26MQGrXIz00RUMNV7BI7OwODhvpoG+oIvYE4aGHRl1VVUUL5Eg1c2epSqpiyHIDYP20namapRWaSqkkbHidGfY9WTVlmuLTNzFK1lHy5F0+rIWw6EFqio2Zkq1otbaUnUgvy4YaHa6FOdtgN9c7Bd5aCf2ZieRjj5asa+EO7HHXfUbcqzs+Jy29Rx0NSihlNHUxzRPyvGwYfPRfxbxLU3uG2xzOSUi5m38T/20GVFI7VKoP1MBqxuLgVkUI3CIBn6garDcgIxNH90kzIFWKMeRcj6auODqy922oemooqiI1DsTMiZIUDYDO2qSadWncH+5+Bp98C26Ge3xP3a8pAxkZ0u9+KjqW4lRdidyjskHEs0Lm5VbPIoLRO4Gevj9NumjfgeoqBQlahMzKd2x19dTbrBFQW93EeTjCooxk+WufB8nfUkxlKpIpJdSem2peXI+JoCviJWcUWerr6haqFZJUDAmInK7eg30L0PZ8JLjUVzzmmaYkrEgYCM+g9PnpjVF0NGGdDFLErYkCEM0Y9QNW9sNJXIGyu4yCR114EjoTrVjXIykttDV0tOInqHmUDAMm5PzOhbtJoYrjYZIpDyyL8D+Kn+mmBVHlcjICgdNCd4o1rFeKVQ0bHcemhUkMJ10DIdzMlmZqapaJ2zhip9dMDgi4vb7tTksBiTlIPiD4/kaA4qZFuVSqEskcrKG88HA0SWqQ80EpO52YDzHjrSbsTEA0Zo+ObmiVh0I19MjkbahcOz/tCz01QDzlkAO/iNTJY5iCAhA9NQmgbhfdI6nmGQCdAzdWGmBO0dPaWKAH3D/LS5pYGesiRgRlxkkaZFwRY7LJyfCsZ/lqLKrAIAnQ+4oq2pYq2/XR52I5NhuRPjXN/0LpdVWWU+umb2N05p+HqvP66st/yrrSxU4tF2tsTFvFlpS33H2yj96lduYEfpOvVZWiEwl/gkXrq8radbfUSUlUvPSTHG/wCk6quKbI9Da4ZB78an3G9NUtWCOLSM1hl0ZypkgqJVkyDy+9jVRWSE1ckhOSHCj6a72AcrSMW6KWxn0OoM45lz5ybnS1TgdR1KcF1O8zlJnbO5f+mtHdnFxhFgpSzgYQZzrOlbARKWUbEAfXGn12U0dHdeGII5crIwKZz6aVkjYE1MFtMRCPiSf9oxqkU5XxUKdReFuGq+gkdw7RxTHL5cnPyHhoY4kst/orunsNzHsaPh6cjlZtugfRPYKdooFWotdXPIWBJ9vJX1B30lVmiAW8Q0pbTQ2pSsFPEgbPMFXGc9c+eqSGoFpqnjiz3HNuvjHnp9Nfrnw+1fy+y0tDSqxyx992HXoQR5/jUK18C01jnhqBV11TK7COR6iZnDKT4A7DfXbB1AQ6l/MXqFHJn1PpqHVxgFgcDCk41blVVnCrhAMaDeMr0aCy3GrXAPJ3MZPi52AH1Olqu2nrLNLEVx3D+zONrhArJhmRxyDC4I2216tcu7nGwbOPn/AN9CbRzR3eoilkkkkDDJkYk7ep1e0c5hlRh+tOnnjWjrQ1MYts7j47Nbi8lBNSlsd0wYfI/5H30ZmdkPxIdJrs/vgt91iSRv3cg5d/Eev4+2mvcadxEtTTvzRsMgjQgH1EWdGWNHVB6uJGUbsNwdG97ZYrBLk4zHj76VdorWe608bZB5wCDo547rvZrAFz8WBqLI7sAM8p0OoB1lE8SFscy+Y0yuyteWwz/+4P8A0jS4tl3E7immGebYE6aPZ9AKe1ToPh78kf8ACNaFa6bYgFtjUznxNwFV1NK/LA7cu3MBnOhn9iVU/D09nuMbF1/1T43HlrRHCtxoL7Qr7O6yhhnHXUiWgt5leCaljLZ8RoTYd9yJMjXmZPtnBVfbaSqqKgKqIjfXQpMnKEHkx1qvtK4cpX4fnqIYxH7PGXIUdRjprMclM3Icj3jKQB9d9e2d9y6iwOs9zSI/uNj4hjTD7J+JY7dcKixzSCMue+pyxwPUaVtbIVmcDHxnbz1HmuE5VaiGQpU07d4jjr6jXnTmujKq7DW2xNNVFbHX18iEgNnLKfBh10V2qGN402UDbppD8K8XSXWnpqx3/fkcrH1HUaaFr4klEA5IHZh/C2RqAoVbRmslgYbjEmRY1VVOQfHVdX1Ce7BnLcw6eGqZbxcalQe6FOn8UhyR8gNdUwkRZpGJY5Zj1OjZt+IIAWS6msEo9licA9ZJPBRpYdoV2juF5t9opzyUVI4d/wC1IR7o9fEnRxc62OjonlYYAGy+LHw0kuJ7mwu9OQxZe955SBuT4n/DTKE73J8lzrUG+LKP2Ti+ZscqyNza8VC92qnOGjcH0wdj/hqw4+kilq6edXD88S5bxDDYg/YHUGskSSBX2JdOX0LddUyEeJPoa6SBY5Uf95A+PmNO/gXimO6U4pmYFTvy52XPUfLPTWb4654XUAE5AyPtqbb+Ia61VqLQVksTyMFwp2314KQdwX0w0Zqx7VHS3WkqlwRzgkDUjtCuCzw0tPHnrzH6aHrRVTR+yComdggXJY5ycakX2oa5VyCP3wq4AGpbE5XBtRI6WU9FEz1kIXrzDTv4KUC1P6yE/gaVtHRw2yJqmoYd5jYeXy0zOAJTNZDIf1SE/gasr6OoJmUODuN7hwvPHXUTBwBh4mPusP8ADTa4e7QqXixzP3giqT8UR6jSAtgKJ3Z8Rqz4eFRHeUSlfkmfIjbwDeGfTXGGxJ7MdXO/Bmi7qgu1slpXX3WjbOemcbHWbL9b6e2ukEfvTDmd1/h8Nz5nrpl8T8ccR2Oyg3Kymlml/dJVd4DDIcb4HnpPVty5yZpC000hyzOfHQd+DHY1RXsygrUPeMxG3nqpeQxjn6eIGNEbU5uE0cQHMz55Yk6t558hqouVDIU72MEmZykRA2ZR1YemcDTlB1uWBCdkS17Pqh1aqpzkLkOB5HTe4frp5EAjUs42IHjpc8CcOzQxyyMh5sbk+Z0cWRKmnrCIw2VOdtRXkM0vx1IUbhxTVFWF5pUIbGxz01NppppPekyqep66jQVWYQ0kZV/Hm1KWWGGleomlVFUczSMcBR56lPwJSi+zB7ie4d9IICxVF6nyGlxxBBG00lQIZEHQEHONF/GbRpUQQCF+fkE8rDqC26r9F3+uhgtzSYjmBUbssnnr6HDwNoGbzC4ApyHZPQgddZRUr3ayKWXqPH541FgpppqdkaVQFYMDnptpi01goKylq7pX0CSQUceECMAXmbZF/mT8tUkPBzU0KyvTSzLI2VeJu9Gf4WA6aE4rD+0jOA7WcFgi9rra52WiQynlYmTIChRudzo/7LOz+1VzU1xuFwSoqx7yUhHIFOduYn4tx4asLlY6m22K3UAhqaequ7F3fuR+7pk+u2cFvXA1Go6OWOGeZIXhWRhHTRd6qMAOmRnOdvvnQ8AzCsA7kOZUad+46Ba8YaWQKB1xroa2jolKwR87+Y/roBtvFdwpBDRXKOeeUjB7w8oXHr46NLRFT3ulE9HKrblWTI5lI6gjS7KWrOjIwCevYkKsnlqn55DnyHgNN3s3OeHv/sP8hpY1Nqmh3ZNs6aPZ7GIrEV/3h/kNLT+UL1MiWKwV15dVo6csPFzso+umvwB2XQx1yXKqYzdzuX6ID4gefz1f8LcG1Vwgjrryi2e1oAUoozyu4/tsOg9Brrx5xLPS2gUtpjWjouYQR4HvzseioPAeZOvAEzqryPESh7VLvYbvTJZ6lInpIn/1mcFWA/SR44zrO3E1NZ4q1TZZqqGmY7LUsGZseIA6D0Or3iKpluVyqBNVxGGnkaCMR5kGQP3j+W5wM+WheB6YVz1E0yyRRgquI8EeoHpptVeySYboytwElWOg7mKQGSVK6uPcU4KnBDdSSOg8PLJ9NGY4UgkvAoFAKUEaw7HI5v1EfNs6i2KtghnrL3HO/eugioU91im3LznbAwPDzOrrhCsWnuUNPIuA7YznII/h88jqPME+WjathWfzN7CrU1sIa2fhqGhjjPIOV15W28fDXe1cOrLX1qpgEMOT7avSEkpxGDy7bEeB89faeT2WRpjs77MAPEaxj5nuOpS8U0rcPWCrr5QJO5jyqZxzE7AfnSju194irqelaZI3o4pFnMaOAMDc8+P048+mmR2kX2aos9XSqilnAADrkfEOo0nrxTXEVd1t8pR4YJI4I4+Y4GTkKAOuy+OrsRFK8tQ/CHkOz4ltPxzbbzcamVrh3EskpYqylo28uQ+Xh0Gp1O0siFlEFQTuQMc39fxoNj4Lb2CdO6dZ41GX5Tsx8PzjRFwNw5d6G6QRVcBqbfFT+2zRs3I6rz4UKx6E46dMHWmWashDF4eZ919WKDrrqEvEXc0lJbrDDGySqPbawDYGRh7q/RcdfPUSnp3nlSni5syssYA/UScDXuce33urqa6up4qiVufklcsQD0GRn/I1bWyjltXtV4kWKSG3U71CssgKl8YQZz/EQfpqwMFTufQ4aLQj2E+JVcVVaVd8q1pyTHB3drpRnKhUA7xvqcD6nVdMye2LFj9zSJknzbz/AJ67UVJSwVkcVRc6dTSxlperZlbdjt/aZh9NcZKNZo+SKvopTVy4DCXGRnHiPIaXgAMTYZ8Zm3hr+z/Hv/MkW+unpaWauBbnmIEcZOx8FGOmrS0Tz99bqagkamuFwnBQpnlaJSRzED4eZix22wBtqvuFBUftKmtQXumGF5j8IJ/UD4gLzHUvh65xU1VXX2JC80jCgtceNkXHKG9AAPu2pr2FlkfiVhKvu2f8vf8AvzGlHxxBSyT2+7J3y07d21TEOZlHgzKOqn+IfXTQ7P5YprK0kEiSxNKSrocgjA6azhbKpLlbLddVDQBStLVKGxJBKh2YH5b49CPHTp7By6WG8UzzSSimuksS84xyjlU4A8t8/XSrKuJDDwZPmJX0ye4q7j2mX64SF2o37tT+7iGyj5+eqCp4nuF8r/aK1z3NFHJNy9FVVB3x/ewPpot7TOHpbHbKmot8iIe5KqvT3iQox99LythpLdwlUqKqQT3KaO3wlIiylBgtg+O/LvpWMSFLWSn6elYD2fECnlaG2ElSHePnHzdif5Y1UU0apBUvL0ij5F2zmV8gfjmP00S1jUfeyCBHnjWTkV5fcTlRcDHifA6GqiPuMu9Oy98eYCOTb86oVtVbkVli/dPzPXCteLc9RDVMwo5W5VY9Fcb50cQqI2hqKeaN3PLgRuGOeoI9RoJlZltxRIYIuWrc+97zZCKNTOGrlUU1xRDVOkMoIkcZCpjcNgeWhFpKal1TfaQMJpi2zPWUUFQy8jPGrODtg43H31xraxFrooFZO9kXJDdBjoT9NDfZ5eJaq21FNNPLUGKTnWV25uZW3wM+AOdt9F1JTw1FT37xoZFGzHqBrGtXixEoWwWDkINcdtbrXDSvXNN3YJmlZFBYqg5sb7YOw+ulWlwirKpp0qKpZlzVTSuoJMr7gdR8KkD76Ou2S4Qh1olnAmeldHCsQVDEb4HXYfcjS2pA1NQ1TmnLE4QMxySdbP0zHZ9fA7mfn5xqUKvcmrcaqSjSB7pWP7S5kIUcp6+71PmRq4hcyQVkipLURTzLFFJK5z3MA5ANsbFsn6ap7d7QswkgWFTEAsanxYYC/wDOy/bVzc+6pgaWKd2ip1FOpUY5uUYJ+ZOT9dPNBe8knxD+kBuIcjXvucqCCTuWfuICGYnlKg/z3/Op9ZRpFYqKlam7trpcAWGTjuIF5m2J6En8agwqkMKbyo2Ns53124vcwXYUDSyOLbQJTty/pllPM/TxxzDRZVOl6M1Mq9koVTrZkGOSdLbWVvJATO+OUqu/4886i0tKguVHFLRpyxxF3wGX0zsTrpVRxpQ0NJmSJnIJznGTvrjHU1Edwq545UcRR90mfH/O2qExQmNyHufB/qbXZ2Gjs6k9LvVUNuqpVHtsNY5pIIXb95FzbuwPgAuFyNtzrlSxVEtkUCVYAk4UEf7PfA3+eNQpZo6q/wBLHTECCkQwA5HL3h3dt+mWJ+w1LoRTmnuFM0jzurFlES8w8CN22/GoqEKUs7eTNLLd2avgdKpHUJrWkD0d9m71mSV6OrdFJIVpAwbGPDmzp89hcsc/DNXKrFpTV8srEYLMsaqCfXAGkZwlQV9VcLhQC3KsdbaFdDUMd3T3htkDqDp5dhMEsHDFYJhTgtWE/uTkfAvXHjpaOWp0ZtZFAGKWHowH7brj39FQUsEeVmm55Tn4Y0GSfvgfXSq4lqFiulFQQ1cipZ6LvZc5/wDUSdPyw/4dGXapce44r4ctrjLzrzzHOeWLmyfuQPtpcVc09xWat7+N5rrVPP0/QCUQfLJY/wDx0ldFNN5MlFgrqAB/MqqtYliiPO8zNG7D5HYa+1dDHKXlkpV7ukhEhUN5YwPqxUakXNOZ5wJUVIgkKcoG5yNS7TSU11uNJbWV2FbXL3rk/wCyjBY/zz9NW5CqiKo9zIwi11vM7Pk/9mUtxszW60W6GWB/aJI2qZQx6c5938DP11XQBkoa9siLkpnxjruQNG3EL0t0uFTUpHLCjMe7UHZUGyj7AaHHooYoaxeRmZ6WXqfHlz/hoWVFTYn0r4zKgUg+ISdj/EYkuCWyplAl9nWMEDHOeoz674zp205WniMsvuqoySfADrrMnDntVDxXHUQosf71SpYe7nmGAfTprQPHt1itNkMLmTNRkMI05mCAZY4Hpt9RrKuTmwPzFY50uopOLrgl84hmq3Ug983vkggR7EfM4C58tQEjWSijVZ3cO5lcKcnkG512prTXzQVtZ+zWV1DbSycuObc7Dy28fDUynoqRLXEaiSqSaUiNRA3uhRudycnJH51s0WtXSePvqZWUpycgL8ddf+yx4NpUFw9sajUiigesfP8AEowg+sjD/g1yq2qDJHHIsURLbliBn7nVpY4rfT8OXCpnhlq3rKpKRZHlxzxx+82PIFiNRYf2ctQ7x22IgbESOWP40OPW5HI+59hg/Tv6XS/yIA/tLDh2mqq+70ULxxTRGUM5XB90bnoT4DQ3cqysudRXVcsccTXO4OwZyAOVTy+J6e+fto0shtNHbr1eHtwi9jonVXjmI9+T3BjPjgnQraKK0iSgj9gMsdPSiVhJKfdZiW/xH20nIVywWR/WagjHY8CeK4y/tINJEskUERJK4IB+YJH31RUsdMZ0cs0JkYykHbIAyPQ740RLBaZ466rQ1NulP7tXjPOpx442PXUOe1zU99tUVTSxyU7oGeam6d2DzFiOnRT1A1dlWNTSAf8AdT5GjBVLKxrXudKqyUNkrqeGcNUPTSIs0anlBlK5OT6cwGrCS4yUxuPsdPDSoIQ37tfeO/md/DVDTVjXGxS1ZZnlNS7kkb55sgn8at6cNUVFfExHvRhcfTTazyxixlXMDl1shhLXh6pdOKOGK2WZnMjz0TljnbnOPxJp7dhMRh4euMTDBSvdCPkqjWb6aoMdHbqvPvUlxjkz6PGufyh1qLsrp/Zob8gGFNyaQfJkRv8AHWYvVbD8z6POY/pXXWuxP//Z",
+      yachtParty: "data:image/jpeg;base64,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",
+      charcuterie: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBAUEBAYFBQUGBgYHCQ4JCQgICRINDQoOFRIWFhUSFBQXGiEcFxgfGRQUHScdHyIjJSUlFhwpLCgkKyEkJST/2wBDAQYGBgkICREJCREkGBQYJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCT/wAARCACgAKADASIAAhEBAxEB/8QAHAAAAgMBAQEBAAAAAAAAAAAABQYDBAcCCAEA/8QAQhAAAgEDAgMGAwUFBgQHAAAAAQIDBAURACEGEjETIkFRYXEHgZEUIzKhsRVCUmLBJDNygtHhQ5Lw8TRTVGOistL/xAAaAQADAQEBAQAAAAAAAAAAAAACAwQBBQAG/8QAJBEAAgIBBAMBAAMBAAAAAAAAAAECEQMEEiExE0FRIhRhcTL/2gAMAwEAAhEDEQA/AERI4893B+ersCkdVGPMapoI5dyqt8tWI4YvDmQj+FiNazAnAo89EKeIAAkaD06spGKl/ZgG/wB/z1buN8HDttkrpqhOUbKgyrSN5DfQGjFTU2Rq59gLxOQBjkPjvrEp/ihdqqXnjcQxg9yNd8e/mdEoPifcwFQz9Mc8hUZPnrK+hUbI9IB11Ulo+u22s6t/xgq4KmNaiJamCTmJDHvgDxB1qFnuNDfaIVdGSyfvL+8h8iNZJNcmI+cO3et4WuS11G58pIz+GRfI63mw3+i4it61lG4IOzoT3o28jrCaiKIfvED11NYOIKzha4LW0bmSM7TQ52kX/XWKRrRvs9PFUwPBMiyRSDlZWGQRrG+NeB67hyR6ykq5XthPd5l5jB6Mc7jyOtasl6ouIbdHW0UnNG/VT1RvFT66uzQxzxPFKiyRupVlYZDA+B1ThzSxu0T5sEcipnkXjKDl4kudWyg4tkaAgY3FOP8A9ac7aJ2YyUzKjNSwEDl5ie70G41V+Kdvipqq/GKMLGpljQDwVY1UDPzGoKGSpnWNFpqWYfZoCyyPyMO4B3T8tFo5bs9ga2O3T0X6ujq35u1q6mN8ZwnK30H+uo5JrlJMBTVM0ygDMcoEfN+Y21WltdTiVJaNwjjBP2vf5eY99WLetXTg0YpgseObvzIT7YP+2u8fO3yEBPU8scZUU0n8OAyj6tvr8sF3gm+0tcKaVU7zRtTDOPEZHgRkfPVR6Z5Y3R554o172YI4yV9c5/PQukrI5HmiS41zOAQAHj73qeVv6aCcU07G45tSQdq44YKqrtaqsxoJpCiyYIELYKrv5Z/PVu03antSLV3GnAkaXsKdE74UhecuAfEAqB5Zzoddi0HGV7HZzsCyqeTG3dXrqhdcTUFtcxSuoq6g8rNlmwsa4yPfXPk28KX1nSVedv4hMp7rwZVN96wpn8pI2jI+mi8FksNwUGiuanPTknU/kdbVW/DKyVi5larmH/v9nMD/AMyaEP8AA7g6Y5koSp/jp/uWH/Kcflrjbzs7UZVVcFV0A56aqDr5SRkZ+Y1k3xAuc894/Zkjgij7hCnK853J16Y4j+EVNw9Z6i5WXiC6UwpxzmKVg4Iz0B215JuUjVNzqZ5JC7ySMS5/eJbrpkHYMlREqciGQD/DroOVQRg5JPhqfutGCviQAPQa+09NmYksFCHBJ8Mf750xoxfC5RU6GdCfxGQBB5AbfTWqcFzVlir4QQ6U7KVYeBXOQD8jt7aR+G3stFItXUTLVzqSIo2jPKSOuBt+f009U/ENwvTrNa40WnhHZu3dHfO4ZhnujbAOf10KfoY4qv7NAFXFWsVgWWU/yxk/01zLbp6ZVeam7IOeVS+ELHyA6nXy3WXi2e2UzTT0dKMcxqJyZHbP8IyQB5aNW7h6CENPcbxVXAjqFRY4wfA5PQ/PReBdsneXmkD+H+J6nhC5CppW54JMCanJ2ceY9fXWwWnjuw3hI2hrAkjDeOQEMD5azMHhyDLqlF94C4aR+0L+2SB9MjXVtprbT1tHcY6mP9nVS5R44myJAd0ZM91t/PGtajFVZqbfoAceVD3Rb8Y2EkBkqShHTvSImfqNRWf7HCH+02+sqiqRqGhfl5Qq+XT66sWaOS9NdbeaKuxLDNHC32ZyrO1RzjcDHTGmyg+EbXK3rU11wq7bVFm7kewC52yD46DTOMcrc+EZqd0sVQ5YosOFZw3aNcqCUk5EtOr5+eBr4lpssjKkN7t8hG5WpgeM/Xvfrq/xP8P7pZJIZoblUXGIA95U58ejDHT1zoFMlwKr9kqFppE25RCA3sQ2u1jSmrxzOJkm4OskEGpuDqaogJpjTFyNjBUgn88Ej5aGLwJXQHtpFrHVGUjGHVRkdSM41+ilrqpeSqPYyjrNFAq5HrudWKeepNTTwrcIqhBLGDglWwXGQcHfW5FljF8noSwykvzRxeRXtxNepKZXIaVg/KcYGcDwPkdc1sVUbPZIUYGYvUyqOmW7RcknGei6s1NVURX69PCgePtuV1Kc+e8x6fPz1LLXS0sFiPYRTGSOYMsiHbMzdPEHbUjbWKFfStJPNkt+hZoOI7rQ70lzqo8eCSnA+WjUfxW4ko1HaTQVIH/nRDJ+YxqlS8F3KqJaUxRIRuSCwB99h4+BOrb8JWChQNc7vzsP+HHIAPoM/rqTwX3wdDypdEHEvxjqbrw3X0NdQwUyNCxMsDEsSNwME7b68wyjPLnqDzE61/4u3izWyzLb7NTKHqjytKy94qPI76xaWY4Qeul7FF8MLc5LlFpZ8TIqjITYep088F2f7wyyqGDdSR46SLRSNU1Zk3PKf+jrVOFZFNCAEIXO2lZpUinTwt8ltuCKaur45+0WLlJwAgPXx0Y4O4da11TQUsgmgDsGD5Lzcxxv4dNXo4g1MznI7hUeeTo3wFQ09HcVqJaZ6iFN3Db5HlvtqWOS32XzioxtIa5a26ykQ2+hpFkUABVUzuoHTzA1PScHcV3oclymnNOCD2c0gjjGOndUEn2205W2+faqfkoKeGljH7vLjHy2Gp5Z5JByz1TN6LsNOeaJzlhkAbF8NrTw7MampuZnnI3URqQPQZB0Wtlts1m5xbaCRmkftGaVi2WP72D0PtjUUlwggyI0X366o1F3cghWI0uWdvoZHAl2MYuEyrhnSFfJRqrPcqdd2dnP8x0qzXCVs9/bVSSoc7ls6VvbDUEuhomv6psmw9NJvH1JT3i2Gt7JzNTMAWjALMhOCDnrg4P11O8mcbn01JSQQ3BjRVZIp6j7uTBwQCeoz46dp8zx5FJMXqMKy43GjNoqWjUc8dwNNMNsTAqfy8NEbbSyi624z3GnlQzxndO9jmHiNse+tEn+DFFMrfYrzMVP7sneH1Uj9NDYfhieFaoXOqmoXhgBOS5B3GOjD189fRT1mOUHTPmMehyxyK1xYi3iTF+rpGq3plmkyCqnDjJ3yNtXL7MlNaLE0sv3UdOpaRlz+JnIProjV8I3msh+00lHUNTOCR2Q5gmWY/hzt1BzjUl6tpWN4Y5G7GKKnhPa4bsyQ5PKT06fnqWOROOKJa8UlLLKhXnjvd1fMj1kwPi7FR9Tq5b+E55SBPJHF6KOdvro9PxHaoV/s8E1S/gznlXQmp4srWYJB2VMCcARrv8AU6RcFy3Zb+vRlnx14WmtVxtk5MwopYjGZ3XIVubfYem+PHWVVtuqKVI4J6cxyMS3M2QSPD216meimucY+2u0/NviXvD3wdLfGnw5orjClVJGW5Tk8jcrKfMHUOTVQUuOimGJ1yZFYqb7NbO0RC0kkixgn331o3DlvMUIDryoxyNGuFeA7bQRRSgmsoHBQKwAK5GD/mGmGp4cW3RUiIpkgGeWQjZ18j/NqeWZZOIluGKj2D7dTtLz4HM0YLKp6dNgffTHaSLzwtFWRxrFVw92UJ0Iz5ehzqjyRUkMkyALz428BjUvBFWGQwxnMfbTBkHV+/8A0B1PODqinJyrLdtvE9tnjqBIww3LIudsHoce+R7HTwar7REJlbuN+R8tK1fDRUluqnqexQIyszuQCEJIO5/ykeo1JZq2SKKSmZucKuVI6MBjDD5H8vTWRe3hkqd9BOapHMQWA+eoDMD0OfbQqy8dyU1XPS16K3ZBogpjH94rHB+Yxp6tHEVHXQRy0sCRF85Ux4PXx05L6el/QtGlqpBlKWocekZ1cpOGLpWf8JIF85W3+g306R3BW2yT7a6xGZBIvckPUjo3vo9qAbYGouDqeOLlqm7VyCCQSoHtpZuNC9oujU7kkI2Vb+JfA60QSZ3JznQDjSgFVQpWIPvKc7keKHr9Dg/XXnFegU3fIMZSG50ZkY75U4/TVWWkjkn7eUCZ85PbfeA/JsjVyNg8EZLYJUddRsBzbHOmKTSMcUyWa/XUxLDBURUq9CYYQpPz8PlqWzXe22kSCemrJmlYtJJIySFj5nYaoEb51XlXmzo1kYLxxZh09/KkjtAvsP8AXRLhiE3ec1bcxRH5EJOcnxP0/XWd19ZjJB1qfBKCKw0SjcmEMSPNjkn89Zlk1ECMVY00bhW72yluUE+B0UKCSmD8gYIeWVCMjGhnYB4GTHUdR4HRCzVmciXvOi4kH8aefy1y5PkpiRizJFFJNa3MMchzJCQGXm88H9dcUdfWUsIp56eGojy2x7o38MasNVfsqsV4256eTYj08QfXRWaiglAeNgAw5gfA6W+HaGJ/RUro4alJEgSSCTH9xKcj/K3j89fOBbS9NZ7hdmBX7NUPG8ZXvKGK5YfPHy0xT26F4sVBRFHSQkDlPvqlC1JGZaCa406rIhZSJByh8bZI8D00+E5ydMKU/wAUhe4se3iCpBhq5JKmeDtcOAAwZiGBztgr7dNW+A7hcbnb457jQfZpIurFvxrnByMDrnfG3lova6BGmq6idY355AYyQDjGckfU7jRGko/7UTylkdOVwDgnWubdRaFNV0Id5tcvD13mgMkkscj9pDJIcsyN+EE+m6/Iant99usU8cFNUAFACxdwqAepPXTRxjajX2WVgR9qt47eJs45k25gfoDj09dZpOxlVJjuDggL0309Ozy5Rr9s4nmmVAzBm2BZPE6Z6S4dqgLdcayewVEVPDDy1IVmH93ynm/XWgWup7SMLzAnz16z3YwrVblT0xqU9nUQPDMe5ICrAjwIxoUkuGwwyNXqZjgAjIPQddGmC0LNMrxRCCUlXiLRtt5HGvzrkjDY0Sv9OKapSXAAmUk46cw/2xoTnDDPjjWmEjxzDdTn01AzsD95GPltqZpu9gE7HXxpSR5++is8eUqS1veUmmMwihiyMgZLH01q/BMAp7NRQhucLEuD5jWV8J13a2xqY9GUnI6kgnP9NapwbIstrpURgrpEACDtttr2of5FR7G+FicEYOu41EdUswXODh181Ox1HTBsAkcpPVc+PmNdzydkefvfIa5bKIooUspr0rJQCQk/ZqGG5CbZ+Z/TTBSVsAtYEzdl2Aw7OcADrk+mkGnrzTQTVL1bxAyOx5TgDLHoPHQm9XytvNIaftnEBIJBO7eWdHjxOQR3xFxzHfLxTUNMZFtsMwPNnDTP05vQeX11crE55ldYq5UZf+CA/Tz20iSw9jMFTm58jkCqCdaPZeH7veI4HejEWcZWWVlcjzIH9dXKMYUkEpKg7wdVvLQSxPWNP2LBQjoUkj26EaYoKlkIB+uq9FStRLLSrIal0kIOSG5fIZHUa6ZJD1IGpMvErAtSO+JXV6Ond2IhmLU8yjbmUjIOfr+Ws0eheklnpJDhoW2c9GU7g6Z+PrytFS26jDjnkkaU4PgByj8yfpodKP2lQJWYy9OOzkI6mMnr/lJ/M6dHmIxRqNk3DRjWMJFaIpnU96omk5Mn00+2eBTuJ1hPQxhw4Hz1mVtqpaWsURqzDOMcwHNp/tt4EqqZKdVxsGOCProhY0IioB1yPz1eppAADsMfloNS1yO3KowOo8dv++rQqVL5DYB6515MxoL1FHT3GERTKXAPPnOMHQmfhmJ8NS1LofKQcw+vXVumr1VgA2ffpqvV0V1hmeWhmppomPMsUjFGHpzbj66Jv4AlzyDp7BcoySqxzZ8UO5+R0MkimglCTRyQk9edSP10ZF/rqPa4W2rhA6sE7RfqudXabiS31i8gmjf+XI/TXlILb8PD/DFZ2IkhLlJELY9CD0/PTpwlxhW0M0lElLTsEPMrOWyQTnoNuulTiulSzcdXCNByRTstQoGw7w3/APkNWeH6kSX3GcHs8EfPVU4prknxv9KzZ6HiqueMM0VGfEjLD+uql14yqZfuUt8TZ2LxzbL67rvpchkaqU4OIgcAfxep1ahWJGwx3z5akeGPwupIr9lNKqJKTyRjYHxPn76lp0eadYoWwc7t4AeupJn5hyrggHA1JbklWZhGiOvi3NjJ8tG2oIGTGiyUVLQRgxohkO7SEDmY++mGOp5E2wS3gVByfT/bQagijenVmR0l8VLAj3zq9DFNESyzsjH95QM/U6hlJt2ClfYUjilmmMrxrGDvjGfy6frq7HTwyygOvaerjO/hqhS1tSkXLJIJCDszYzjV+nmeVspHnHU9BrFb7PPjoSfiPwulLVW68RtzRn+zyxk91X3KsB5HcY88a+8NToZjTyL93KpjbywRg6v/ABer/sfCIdskx1cDcwOwySPngHfw3GlnhiqBrIyxOCBtqmHaHY3cKLlVRNSVvYSSxQBXKNLIe6pHicb6ZLdaK1HSVaa2V8DYIeGfBI898aEcQWaauvM9ZSrO2Yo3YRE9QCCcD266K2q51VLSKtXNFLEg2aaNVK46d4Y1r4dAUGROaeUqB2PLjmVuq6+S3YtlVPNgjJGlOfiSsulW9PY7XWXiXOOdBiFfTmPUaI0nw64tu7rPeb8lrj/9LQDJA8i3ifnrwLouSX+Wh5pJGVY1zhpGCgfXTNwlxLUX2mY0ydtCJgDUdI+UDcKf3j7barWr4ZcOUBWWeke5VA37evcynPoD3R9NMxlgt0AeR44IEGN8KoHkB/Qa9z6PUXunTVOrs1tuX/i6KCVhtzlcMP8AMN9Lly43llbsbXDsTgSyLnPsNVmr71DGXrbpJBId1iRRz/5h0UenXR7WH42/9POnxjsS9hFe41JaI9jLgbMhOQfkf10lWec09xgkbO/dyfI9Nb5xDZobzaKuhn3SeNoznwJGx+u/y1g60UlPI9NUAxzRtyN6MNj+mrX0c5PmzQaWTuDy6j31DUXNEfk5yPQdTpaa6zWyjZ6hWcou3Kdm9PTUtolqK+dJZYMrnvRjOR650mS28sr8q9DpaVkqipweTz8hpppHjplAC/loHa3gEIImenYHlwQQPrjGjEUkwGY65nH8PLGR9dRZJWzN1hWOvhbALKh9RqUVaE4SQynyjUnQ2Gpk6SIjepKj9BonSwVUsYMXYOnTB5jj3G2kuzUyUVrJgGnjT+aolC4/yjJOiNruby1SQSTL95srtGVQH0HifU6qRxT0pzm2xn+Hsxk/111Pc6mOPnYKSNxnEa/nufpryVmW2X+K6KnqLHXRyKJWlp3jCvuGJUj56yPhifsTCjSh2hcwuT5qcZ/LTZx9xxRcOcPS1c0gNQycsaEjmZiNgB4DP+usb+FFwqqqrropZCVLCck+DHOdU48cmnP0g8eRJ7Pp6Usdl/b0Eky3B6coqxlUjVj4kMCeniOmiFB8OLBSzfaKmGe5Tc3NzVspkGf8PT8tLHCl/a0O9SymWlKckoGxUDB5h54/TOtFprpSVSB4ZlkU7gg521s4tfr0E3zRbhjjhjCQxpGg6IihQPkNSDLeB0NuvEVuskIeqmBcjuQpu7fLwHqdIV74tuvEMhpaZWggbYQRbs4/mPj+mnYNLPLz6E5M0YDXfePaC0c0NLitqhthT3FPqfH2GkS5V9z4jkNTW1PLApwCx5Y09FA6n0G+qwp6eiJ7blqZunIp+7T3I/F7Db1OvksstSQZTzADCgbBR5AdANdrDpIY19ZBPPKbJqW7z2okW2aRDjlM0m7keg6L8t/XU8fFFQpAlgSU+LjY6oGHG2vqw5G+jyabHNVJBYdTkxu4sLzRB882MYx1zk6xf4h21rVxRJM0YeCuAcKTjDdDv55GfnranIIIPXr10i/E2yNdrHPUwDNRQ/ex+u3eX6b/AC1zQkZPcqk/Y3HKw5cfiGnHgt6e9W+OtpmVSm0m+DE465/66aUftMk1By1EIRyNm6qdKEtbV2pq6jp6mSKnq8CWNTgOAcgHQSx+RUbu2s9C2S8UlwhmNtlhrIopDFIY9hz4z9PXRcxxpTNPKWpkUZd+fCr7k4GvN3DPGt04Uiq47cYf7VyljIvNylc4IGceOuLxxVfOIWUXO4Szopysf4UX2UbaU9DJy4fAXmSRsV2+J/DVtZoluVwr3XPcplBXP+M/0Ol+X40zMxFtsxQdA9TUMSfprLw3MNj9dWIZCDkkDHidUw0ONd8iJ6iXo0iP4vcRkZjpKBc9R3x+h13WfFS6inBW0JLKc55ZiFHywCdIdNUcvjsfTRSmqUzknbrjVa0eF+hP8jIvYA4i4quXElWHuBVFT8MKDCqfY9T6nTJwPcI7dZLlVvkskiluXqFAH+p1QvFliuY7WnKrN/8AbTdwB8P66ltta3EatQUVSmTEcds6gbnH7g9Tv6aRnwbVsRVpsty3GhcF8URVdKXWNpWVA4YDlUj1PT66Nftl4gFty9jADmOToVHiF8l8s6U+HaGS6U32G00sdDaoGHIg2RV/jkY9WPr57DT4opKBEFOqVE6gfeuvcT/Cp6+5+ms0mJO76HamdddlRLfNL/bLjO0SSd4F8tJL/hXrj1OB76lepHZGCmQwwn8QB70n+I+Pt09NRuGmkaV2Z3c5Z2OSdSJHy766iVKkQPnshEJPUbaF3S/U1mr6eKqZRFLGSQDgqebAP5HbRxj3T5Dx8BrPuKJrTfLgaaZ1qUCg9wlWQ+h8RqbVSlsqLpjcMVutrgaJb1J9oSOGi7Yd4nv4LAY3G2x36HfU8V4p5JlhNPUxy9SrL0Hv9dLNshlhMaC4LU08ahUSpjyyezDp9R7asU9lqnuc9ZUV8KwEciIjO3Kmc4OcA779dcqObVRfZa44Gh25+XPMMeWNVKsiaB4mXZlIYHyxqJ6nbvY9xqpUVwycEDm9dNsnoyPidHs9V+zxC8vZKoBAwGXz99IPEDCSRXEDxkbb4IxrZeK6IXdkWijM9VGT3UG/KeufIDzPidJdTw52hMc8sAY57o5mx/ygjWRdMKUbRm6NnU6nIGTn+mmOt4IYyYoaykaQjPZvIYyfbnAGgVfbq6z1H2evpZqeTGQHXqPMHoR6jVUJqieUWcc2Btk67D8oBzk6gEg8NWKSlmuEwgpYXlkPgoz/ANtG5JcgKLbpEiVRX20zcKcM3bimbFHHyQr+OeTZFH9T7aYuD/hPFKqV17btF6rAp2b3PjrXLXaxHTIIY46OjjPJzkYX2AG7H0H5aKDcuug3jS/6A3DHBVt4e5HQGrrdvv5Bkg/yDw/M6LcRUlNSWqoluvaMqL2jUsT8ryY6B2/dBPhufTRValaZWWhVoyRgzv8A3hHp/CPQb+ug/EXIbJXGRh/ctvjO+NFk4iw8S/SF+gvNReKmKHlipaSFgYqWAYjj3Hh1J9Tk6c40winrtrOuHiIpwF6sV8dxp+FXGkLSO4WNF5mY+A1Lop8Nsr1cKaSLYwucb6CcR3iqtiRPR9m7lyGV1znbp6eO+rFLxFa6qFmWabtFblERj5WbfBIz5Z/I6HcfcI18lrmrPttMtPSK1QrMjKVAGeozzfXfy0WbVpqoC8WnakvIgVPeFv1K1dDeZIm5ezeFT0B6r1AZSM79QcaVa/h6roQI4I/tUat91Ism65PRs+WiNvoGo7RBPDVwzRVMQkgdFZUB6FWU+Gdsg7eWrdVPBX2CmmeqKVUw7Nood5VbwC4/ED5fLUTlJ/6dJKETuh4Pu9tdlutx7FfxRrTKJiy+DZOBg+HjpnoOHIHtAqayrqa4o7cyxv2S7HbK4yDjGQT+Whtnj4qlp/2dduHJ5qKEkU9U0iQyhfAgMcj20TtTXa2TPD2EklNIQDkDY+BwCRkeY9dR5HqfZPeJvg//2Q==",
+      beach: "data:image/jpeg;base64,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",
+      city: "data:image/jpeg;base64,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",
+      hound: "data:image/jpeg;base64,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"
+    };
+
+    const loadedSprites = {};
+    Object.keys(TERRI_SPRITE_PATHS).forEach(key => {
+      const img = new Image();
+      img.src = TERRI_SPRITE_PATHS[key];
+      loadedSprites[key] = img;
+    });
+
+    /***********************************************************************
+     * 2. THE 8 ZOMBIE TERRI VARIATIONS (FROM UPLOADED PHOTOS)
+     ***********************************************************************/
+    const ZOMBIE_TYPES = [
+      {
+        id: "lab",
+        name: "Inkfish Biohazard Terri",
+        subtitle: "Standard Lab Walker",
+        spriteKey: "lab",
+        minWave: 1,
+        hp: 58,
+        speed: 44,
+        reward: 18,
+        damage: 10,
+        radius: 22,
+        ringColor: "#10b981",
+        quote: "Why is this biohazard bin overflowing?!",
+        trait: "Marches steadily down the Bond LSC hallway demanding proper PPE."
+      },
+      {
+        id: "chair",
+        name: "Rolling Lab-Stool Sprinter Terri",
+        subtitle: "High-Velocity Caster Threat",
+        spriteKey: "chair",
+        minWave: 1,
+        hp: 42,
+        speed: 78,
+        reward: 22,
+        damage: 8,
+        radius: 20,
+        ringColor: "#38bdf8",
+        quote: "Out of my way, I'm on 5-wheel casters!",
+        trait: "Scoots across the linoleum floor at terrifying speed on her black lab stool."
+      },
+      {
+        id: "bond",
+        name: "Supervisor Terri Lyddon",
+        subtitle: "Clipboard Safety Inspector",
+        spriteKey: "bond",
+        minWave: 2,
+        hp: 125,
+        speed: 38,
+        reward: 32,
+        damage: 15,
+        radius: 25,
+        ringColor: "#f59e0b",
+        quote: "Did you log your QIAcube extraction run?!",
+        trait: "Armored with official Bond Life Sciences supervisor authority and pink plaid resilience."
+      },
+      {
+        id: "beach",
+        name: "Tropical Sabbatical Terri",
+        subtitle: "UV-Resistant Mizzou Polo Strain",
+        spriteKey: "beach",
+        minWave: 3,
+        hp: 175,
+        speed: 52,
+        reward: 40,
+        damage: 16,
+        radius: 24,
+        ringColor: "#eab308",
+        quote: "I left a tropical island for THIS PCR gel?!",
+        trait: "Regenerates 3 HP/sec from tropical vitamin D and resists laser heat."
+      },
+      {
+        id: "charcuterie",
+        name: "VIP Yacht Charcuterie Terri",
+        subtitle: "Champagne & Brie Tank",
+        spriteKey: "charcuterie",
+        minWave: 4,
+        hp: 310,
+        speed: 31,
+        reward: 58,
+        damage: 22,
+        radius: 28,
+        ringColor: "#ec4899",
+        quote: "Touch my charcuterie board and you're on dish duty!",
+        trait: "Heavily fortified with artisanal cured meats, cheese, and yacht sunglasses."
+      },
+      {
+        id: "city",
+        name: "Manhattan Times-Square Titan Terri",
+        subtitle: "Jaywalking Urban Juggernaut",
+        spriteKey: "city",
+        minWave: 6,
+        hp: 460,
+        speed: 42,
+        reward: 78,
+        damage: 28,
+        radius: 30,
+        ringColor: "#a855f7",
+        quote: "Hey! I'm walkin' in the BSL-3 here!",
+        trait: "Unstoppable big-city momentum; takes 25% reduced knockback."
+      },
+      {
+        id: "yachtParty",
+        name: "Superyacht Entourage Boss Terri",
+        subtitle: "Champagne Fleet Commander",
+        spriteKey: "yachtParty",
+        minWave: 8,
+        hp: 780,
+        speed: 36,
+        reward: 135,
+        damage: 35,
+        radius: 33,
+        ringColor: "#f43f5e",
+        quote: "The whole yacht squad is auditing your -80°C freezer!",
+        trait: "Inspires nearby Zombie Terris with a +20% speed aura."
+      },
+      {
+        id: "hound",
+        name: "Dachshund Swarm Commander Terri",
+        subtitle: "Supreme Kennel Overlord (Mega-Boss)",
+        spriteKey: "hound",
+        minWave: 5,
+        hp: 950,
+        speed: 34,
+        reward: 175,
+        damage: 45,
+        radius: 36,
+        ringColor: "#ef4444",
+        quote: "Release the 100 Wiener Dogs into the tissue culture room!",
+        trait: "Periodically spawns speedy Mini-Hound Terri minions when damaged!"
+      }
+    ];
+
+    /***********************************************************************
+     * 3. SCIENCE LAB HANDHELD WEAPONS (8 FUNNY LAB WEAPONS)
+     ***********************************************************************/
+    const WEAPONS_DATA = [
+      {
+        id: "m4_pipette",
+        name: "Eppendorf Multipette M4",
+        icon: "🧪",
+        unlockWave: 1,
+        owned: true,
+        cost: 0,
+        level: 1,
+        baseDamage: 24,
+        baseFireRate: 3.6, // shots/sec
+        projSpeed: 540,
+        projColor: "#34d399",
+        splash: 0,
+        slow: 0,
+        pierce: 1,
+        pellets: 1,
+        upgradeBaseCost: 45,
+        sciencePerk: "Combitips Plus® Rapid Dispense",
+        desc: "Your trusty starter repeating pipette! Fires precision 10µL sterile buffer droplets at rogue Terris."
+      },
+      {
+        id: "multichannel_12",
+        name: "12-Channel Pipette Scattergun",
+        icon: "💉",
+        unlockWave: 2,
+        owned: false,
+        cost: 120,
+        level: 0,
+        baseDamage: 16,
+        baseFireRate: 1.9,
+        projSpeed: 490,
+        projColor: "#38bdf8",
+        splash: 0,
+        slow: 0,
+        pierce: 1,
+        pellets: 6,
+        upgradeBaseCost: 65,
+        sciencePerk: "96-Well Plate Buckshot Spread",
+        desc: "Ejects an entire row of 200µL filter tips at once like a lab shotgun! Devastating against crowds."
+      },
+      {
+        id: "vortex_genie",
+        name: "Vortex-Genie® 2 Sonic Disruptor",
+        icon: "🌀",
+        unlockWave: 3,
+        owned: false,
+        cost: 240,
+        level: 0,
+        baseDamage: 38,
+        baseFireRate: 2.2,
+        projSpeed: 420,
+        projColor: "#a855f7",
+        splash: 55,
+        slow: 0.25,
+        pierce: 2,
+        pellets: 1,
+        upgradeBaseCost: 95,
+        sciencePerk: "3,200 RPM Resuspension Shockwave",
+        desc: "Hurls vibrating microcentrifuge vortex rings that scramble zombie equilibrium and knock them back."
+      },
+      {
+        id: "ln2_cryo",
+        name: "Liquid Nitrogen (-196°C) Dewar Hose",
+        icon: "❄️",
+        unlockWave: 5,
+        owned: false,
+        cost: 420,
+        level: 0,
+        baseDamage: 32,
+        baseFireRate: 5.5,
+        projSpeed: 460,
+        projColor: "#22d3ee",
+        splash: 45,
+        slow: 0.55,
+        pierce: 2,
+        pellets: 1,
+        upgradeBaseCost: 130,
+        sciencePerk: "Snap-Freeze Cryo-Preservation",
+        desc: "Milestone Unlock (Wave 5)! Sprays sub-zero LN2 vapor that snap-freezes Zombie Terris in their tracks."
+      },
+      {
+        id: "bunsen_thrower",
+        name: "70% Ethanol & Bunsen Flamethrower",
+        icon: "🔥",
+        unlockWave: 7,
+        owned: false,
+        cost: 680,
+        level: 0,
+        baseDamage: 46,
+        baseFireRate: 6.5,
+        projSpeed: 430,
+        projColor: "#f97316",
+        splash: 65,
+        slow: 0,
+        pierce: 3,
+        pellets: 2,
+        upgradeBaseCost: 175,
+        sciencePerk: "Aseptic Flame Sterilization DoT",
+        desc: "Milestone Unlock (Wave 7)! Dual-wields a squirt bottle of 70% EtOH and a lit Bunsen burner for aseptic inferno."
+      },
+      {
+        id: "centrifuge_launcher",
+        name: "Unbalanced Ultracentrifuge Launcher",
+        icon: "⚙️",
+        unlockWave: 10,
+        owned: false,
+        cost: 1100,
+        level: 0,
+        baseDamage: 165,
+        baseFireRate: 1.35,
+        projSpeed: 520,
+        projColor: "#f43f5e",
+        splash: 95,
+        slow: 0.3,
+        pierce: 4,
+        pellets: 1,
+        upgradeBaseCost: 240,
+        sciencePerk: "100,000 x g Titanium Rotor Shrapnel",
+        desc: "Milestone Unlock (Wave 10)! Someone forgot to balance the tubes! Fires explosive titanium rotors across the lab."
+      },
+      {
+        id: "flow_laser",
+        name: "488nm Flow Cytometer Argon Laser",
+        icon: "⚡",
+        unlockWave: 15,
+        owned: false,
+        cost: 1850,
+        level: 0,
+        baseDamage: 115,
+        baseFireRate: 8.0,
+        projSpeed: 820,
+        projColor: "#10b981",
+        splash: 40,
+        slow: 0,
+        pierce: 6,
+        pellets: 1,
+        upgradeBaseCost: 350,
+        sciencePerk: "FACS High-Speed Cell Sorting Beam",
+        desc: "Milestone Unlock (Wave 15)! Slices through an entire line of Zombie Terris while gating them by forward scatter."
+      },
+      {
+        id: "crispr_railgun",
+        name: "CRISPR-Cas9 Lentiviral Railgun",
+        icon: "🧬",
+        unlockWave: 20,
+        owned: false,
+        cost: 3200,
+        level: 0,
+        baseDamage: 340,
+        baseFireRate: 2.8,
+        projSpeed: 900,
+        projColor: "#eab308",
+        splash: 120,
+        slow: 0.5,
+        pierce: 8,
+        pellets: 2,
+        upgradeBaseCost: 500,
+        sciencePerk: "Guide-RNA Precision Knockout",
+        desc: "Milestone Unlock (Wave 20)! Rewrites zombie genome on impact, turning enraged Terris back into happy lab supervisors."
+      }
+    ];
+
+    /***********************************************************************
+     * 4. AUTOMATED SCIENCE LAB TURRETS & TOWERS (6 DEPLOYABLE TOWERS)
+     ***********************************************************************/
+    const TURRETS_DATA = [
+      {
+        id: "qiacube_turret",
+        name: "QIAcube® Spin-Column Auto-Turret",
+        icon: "🤖",
+        unlockWave: 1,
+        cost: 110,
+        upgradeBaseCost: 75,
+        baseDamage: 20,
+        fireRate: 2.0,
+        range: 210,
+        color: "#38bdf8",
+        splash: 0,
+        slow: 0,
+        chain: 1,
+        desc: "Automated robotic extraction workstation modified to fire Used Spin Columns at approaching zombies."
+      },
+      {
+        id: "tesla_coil",
+        name: "Van de Graaff & Electrophoresis Tesla Coil",
+        icon: "⚡",
+        unlockWave: 3,
+        cost: 220,
+        upgradeBaseCost: 120,
+        baseDamage: 36,
+        fireRate: 1.5,
+        range: 230,
+        color: "#c084fc",
+        splash: 0,
+        slow: 0.2,
+        chain: 3,
+        desc: "3,000-Volt power supply that arcs high-voltage electrophoresis lightning across up to 3 Zombie Terris!"
+      },
+      {
+        id: "kingfisher_cannon",
+        name: "KingFisher™ Magnetic Bead Rail-Tower",
+        icon: "🧲",
+        unlockWave: 5,
+        cost: 360,
+        upgradeBaseCost: 165,
+        baseDamage: 68,
+        fireRate: 1.3,
+        range: 270,
+        color: "#f59e0b",
+        splash: 55,
+        slow: 0.35,
+        chain: 1,
+        desc: "Milestone Unlock (Wave 5)! Launches super-paramagnetic DynaBeads that clump zombies together and crush them."
+      },
+      {
+        id: "uv_germicidal",
+        name: "254nm UV-C Biosafety Hood Emitter",
+        icon: "🟣",
+        unlockWave: 8,
+        cost: 540,
+        upgradeBaseCost: 220,
+        baseDamage: 48,
+        fireRate: 3.2,
+        range: 200,
+        color: "#a855f7",
+        splash: 80,
+        slow: 0.4,
+        chain: 2,
+        desc: "Milestone Unlock (Wave 8)! Bathes the hallway in germicidal UV-C radiation, dimerizing zombie DNA."
+      },
+      {
+        id: "sonicator_tower",
+        name: "Branson Ultrasonic Cell-Lysis Tower",
+        icon: "🔊",
+        unlockWave: 12,
+        cost: 850,
+        upgradeBaseCost: 310,
+        baseDamage: 125,
+        fireRate: 1.8,
+        range: 250,
+        color: "#2dd4bf",
+        splash: 110,
+        slow: 0.5,
+        chain: 1,
+        desc: "Milestone Unlock (Wave 12)! Emits 20kHz cavitation shockwaves (without ear protection!) that lyse whole crowds."
+      },
+      {
+        id: "pcr_orbital",
+        name: "98°C qPCR Denaturation Laser Matrix",
+        icon: "🔬",
+        unlockWave: 15,
+        cost: 1400,
+        upgradeBaseCost: 480,
+        baseDamage: 240,
+        fireRate: 2.5,
+        range: 320,
+        color: "#ef4444",
+        splash: 75,
+        slow: 0.3,
+        chain: 4,
+        desc: "Milestone Unlock (Wave 15)! Thermal-cycles zombies between 98°C denaturation and 4°C hold with SYBR-Green beams."
+      }
+    ];
+
+    /***********************************************************************
+     * 5. MAGIC JOHNSON LAB FORTIFICATIONS & DEFENSES
+     ***********************************************************************/
+    const LAB_UPGRADES = [
+      {
+        id: "polycarbonate_sash",
+        name: "Reinforced Biosafety Cabinet Sash",
+        icon: "🛡️",
+        level: 0,
+        maxLevel: 15,
+        baseCost: 70,
+        costMult: 1.45,
+        desc: "Increases Maximum Lab Containment Integrity by +45 HP and immediately repairs +45 HP."
+      },
+      {
+        id: "hepa_curtain",
+        name: "Negative-Pressure HEPA Plasma Shield",
+        icon: "🌀",
+        level: 0,
+        maxLevel: 10,
+        baseCost: 110,
+        costMult: 1.55,
+        desc: "Generates a rechargeable +35 Energy Shield that absorbs zombie damage and regenerates between waves."
+      },
+      {
+        id: "sticky_mats",
+        name: " sticky Cleanroom Tacky Floor Mats",
+        icon: "🟦",
+        level: 0,
+        maxLevel: 8,
+        baseCost: 95,
+        costMult: 1.6,
+        desc: "Lines the hallway with ultra-sticky bio-decontamination mats, slowing all Zombie Terris by +6% per level."
+      },
+      {
+        id: "uv_door_grid",
+        name: "Autoclave Steam Moat at Lab Door",
+        icon: "♨️",
+        level: 0,
+        maxLevel: 10,
+        baseCost: 125,
+        costMult: 1.55,
+        desc: "Scorches any Zombie Terri that touches the Magic Johnson Lab barricade for 35 DMG/sec per level."
+      },
+      {
+        id: "nih_r01_grant",
+        name: "NIH R01 Grant Overhead Multiplier",
+        icon: "📈",
+        level: 0,
+        maxLevel: 10,
+        baseCost: 140,
+        costMult: 1.65,
+        desc: "Marc & Jhonny publish a high-impact paper! Increases cash earned from every Zombie Terri by +12% per level."
+      },
+      {
+        id: "grad_student_repair",
+        name: "Undergrad Dishwashing & Repair Crew",
+        icon: "🧹",
+        level: 0,
+        maxLevel: 10,
+        baseCost: 100,
+        costMult: 1.5,
+        desc: "Automatically repairs Lab Containment Integrity by +3 HP/sec continuously during battle."
+      }
+    ];
+
+    /***********************************************************************
+     * 6. MILESTONE SCHEDULE (UNLOCKS EVERY FEW WAVES)
+     ***********************************************************************/
+    const MILESTONES = [
+      { wave: 2, icon: "💉", title: "12-Channel Scattergun", type: "Weapon" },
+      { wave: 3, icon: "⚡", title: "Vortex-Genie & Tesla Coil", type: "Weapon + Tower" },
+      { wave: 5, icon: "❄️", title: "LN2 Cryo-Hose & KingFisher", type: "Cryo + Magnet" },
+      { wave: 7, icon: "🔥", title: "70% EtOH Bunsen Thrower", type: "Flamethrower" },
+      { wave: 8, icon: "🟣", title: "254nm UV-C Hood Emitter", type: "UV Tower" },
+      { wave: 10, icon: "⚙️", title: "Unbalanced Ultracentrifuge", type: "Heavy Launcher" },
+      { wave: 12, icon: "🔊", title: "Ultrasonic Cell-Lysis Tower", type: "Sonic Tower" },
+      { wave: 15, icon: "🔬", title: "Flow Laser & qPCR Matrix", type: "Laser Tier" },
+      { wave: 20, icon: "🧬", title: "CRISPR-Cas9 Railgun", type: "Ultimate Tech" }
+    ];
+
+    /***********************************************************************
+     * 7. SYNTHESIZED SOUND ENGINE (WEB AUDIO API)
+     ***********************************************************************/
+    class SoundEngine {
+      constructor() {
+        this.ctx = null;
+        this.muted = false;
+      }
+      init() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) this.ctx = new AudioCtx();
+        }
+        if (this.ctx && this.ctx.state === "suspended") {
+          this.ctx.resume();
+        }
+      }
+      playPipette(freq = 520, type = "triangle", duration = 0.07) {
+        if (this.muted || !this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(freq * 0.45, this.ctx.currentTime + duration);
+          gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + duration);
+        } catch (e) {}
+      }
+      playZap() {
+        this.playPipette(880, "sawtooth", 0.09);
+      }
+      playPop() {
+        if (this.muted || !this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(280, this.ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(620, this.ctx.currentTime + 0.11);
+          gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.11);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.11);
+        } catch (e) {}
+      }
+      playUnlock() {
+        if (this.muted || !this.ctx) return;
+        [523.25, 659.25, 783.99, 1046.5].forEach((f, idx) => {
+          setTimeout(() => this.playPipette(f, "triangle", 0.16), idx * 75);
+        });
+      }
+    }
+    const sfx = new SoundEngine();
+
+    /***********************************************************************
+     * 8. GAME STATE & PAD POSITIONS
+     ***********************************************************************/
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    // 6 Lab Bench Turret Pads (top & bottom lab benches flanking the central corridor)
+    const TURRET_PADS = [
+      { id: 0, x: 250, y: 78, turret: null, level: 0 },
+      { id: 1, x: 430, y: 78, turret: null, level: 0 },
+      { id: 2, x: 610, y: 78, turret: null, level: 0 },
+      { id: 3, x: 250, y: 382, turret: null, level: 0 },
+      { id: 4, x: 430, y: 382, turret: null, level: 0 },
+      { id: 5, x: 610, y: 382, turret: null, level: 0 }
+    ];
+
+    const state = {
+      money: 150,
+      wave: 1,
+      waveActive: false,
+      autoWave: false,
+      simSpeed: 1,
+      paused: false,
+      kills: 0,
+      labHp: 100,
+      labMaxHp: 100,
+      labShield: 0,
+      labMaxShield: 0,
+      equippedWeaponId: "m4_pipette",
+      selectedTab: "weapons",
+      selectedPadIndex: 0,
+      mouseX: 500,
+      mouseY: 230,
+      mouseDown: false,
+      fireCooldown: 0,
+      caffeineTimer: 0,
+      zombiesToSpawn: [],
+      spawnTimer: 0,
+      waveTotalZombies: 6,
+      waveKilledZombies: 0,
+      zombies: [],
+      projectiles: [],
+      particles: [],
+      floatingTexts: [],
+      lightningBeams: [],
+      unlockedWavesShown: new Set([1])
+    };
+
+    /***********************************************************************
+     * 9. HELPER CALCULATIONS (STATS & SCALING WITH WAVE + UPGRADES)
+     ***********************************************************************/
+    function getGlobalWaveMultiplier() {
+      // Every wave increases global lab tech damage by +8% automatically!
+      return 1 + (state.wave - 1) * 0.08;
+    }
+
+    function getWeaponStats(w) {
+      const lvl = Math.max(1, w.level);
+      const waveMult = getGlobalWaveMultiplier();
+      const dmg = Math.round(w.baseDamage * (1 + (lvl - 1) * 0.34) * waveMult);
+      const rate = +(w.baseFireRate * (1 + (lvl - 1) * 0.08) * (state.caffeineTimer > 0 ? 1.75 : 1)).toFixed(2);
+      const upgradeCost = Math.round(w.upgradeBaseCost * Math.pow(1.42, lvl - 1));
+      return { dmg, rate, upgradeCost };
+    }
+
+    function getTurretStats(tDef, level = 1) {
+      const waveMult = getGlobalWaveMultiplier();
+      const dmg = Math.round(tDef.baseDamage * (1 + (level - 1) * 0.35) * waveMult);
+      const rate = +(tDef.fireRate * (1 + (level - 1) * 0.09) * (state.caffeineTimer > 0 ? 1.5 : 1)).toFixed(2);
+      const upgradeCost = Math.round(tDef.upgradeBaseCost * Math.pow(1.45, level - 1));
+      return { dmg, rate, upgradeCost };
+    }
+
+    function getLabUpgradeCost(u) {
+      return Math.round(u.baseCost * Math.pow(u.costMult, u.level));
+    }
+
+    function getGrantMultiplier() {
+      const grantUpg = LAB_UPGRADES.find(u => u.id === "nih_r01_grant");
+      return 1 + (grantUpg ? grantUpg.level * 0.12 : 0);
+    }
+
+    function getStickySlowMultiplier() {
+      const matUpg = LAB_UPGRADES.find(u => u.id === "sticky_mats");
+      return Math.max(0.4, 1 - (matUpg ? matUpg.level * 0.06 : 0));
+    }
+
+    /***********************************************************************
+     * 10. WAVE GENERATION & ZOMBIE SPAWNING
+     ***********************************************************************/
+    function buildWaveQueue(waveNum) {
+      const count = 5 + Math.floor(waveNum * 2.6);
+      const queue = [];
+      const eligible = ZOMBIE_TYPES.filter(z => z.minWave <= waveNum);
+
+      for (let i = 0; i < count; i++) {
+        // Pick weighted toward newer strains as wave rises
+        let chosen = eligible[Math.floor(Math.random() * eligible.length)];
+        // Guarantee boss on every 5th wave at the end of the queue
+        if (i === count - 1 && waveNum % 5 === 0) {
+          chosen = ZOMBIE_TYPES.find(z => z.id === "hound") || chosen;
+        } else if (i === count - 2 && waveNum >= 4) {
+          chosen = eligible[eligible.length - 1];
+        }
+        queue.push(chosen);
+      }
+      return queue;
+    }
+
+    function startWave() {
+      if (state.waveActive) return;
+      sfx.init();
+      state.zombiesToSpawn = buildWaveQueue(state.wave);
+      state.waveTotalZombies = state.zombiesToSpawn.length;
+      state.waveKilledZombies = 0;
+      state.spawnTimer = 0.2;
+      state.waveActive = true;
+      state.labShield = state.labMaxShield;
+
+      const ann = document.getElementById("waveAnnouncement");
+      ann.textContent = `⚠️ Wave ${state.wave} Outbreak: ${state.waveTotalZombies} Zombie Terris Approaching!`;
+      ann.classList.remove("hidden");
+      setTimeout(() => ann.classList.add("hidden"), 3200);
+
+      updateHUD();
+      renderMilestones();
+    }
+
+    function spawnZombie(zDef, customX = null, customY = null, isMinion = false) {
+      const hpScale = Math.pow(1.22, state.wave - 1);
+      const maxHp = Math.round(zDef.hp * hpScale * (isMinion ? 0.38 : 1));
+      const laneY = customY !== null ? customY : (145 + Math.random() * 170);
+      state.zombies.push({
+        uid: Math.random().toString(36).slice(2),
+        typeId: zDef.id,
+        name: isMinion ? "Mini-Dachshund Terri" : zDef.name,
+        subtitle: zDef.subtitle,
+        spriteKey: zDef.spriteKey,
+        x: customX !== null ? customX : (canvas.width + 35),
+        y: laneY,
+        hp: maxHp,
+        maxHp: maxHp,
+        speed: zDef.speed * (isMinion ? 1.45 : 1) * (0.95 + Math.random() * 0.12),
+        reward: Math.round(zDef.reward * (isMinion ? 0.4 : 1) * getGrantMultiplier()),
+        damage: zDef.damage,
+        radius: isMinion ? 15 : zDef.radius,
+        ringColor: zDef.ringColor,
+        quote: zDef.quote,
+        slowTimer: 0,
+        slowFactor: 0,
+        burnTimer: 0,
+        burnDmg: 0,
+        wobble: Math.random() * Math.PI * 2,
+        summonTimer: 4.5,
+        quoteTimer: Math.random() < 0.35 ? 2.4 : 0
+      });
+    }
+
+    /***********************************************************************
+     * 11. COMBAT, SHOOTING & DAMAGE LOGIC
+     ***********************************************************************/
+    function firePlayerWeapon() {
+      const w = WEAPONS_DATA.find(item => item.id === state.equippedWeaponId);
+      if (!w || !w.owned) return;
+      const stats = getWeaponStats(w);
+      state.fireCooldown = 1 / stats.rate;
+
+      const originX = 148;
+      const originY = 230;
+      const baseAngle = Math.atan2(state.mouseY - originY, state.mouseX - originX);
+
+      sfx.playPipette(w.id === "crispr_railgun" ? 920 : w.id === "bunsen_thrower" ? 260 : 540);
+
+      const pellets = w.pellets || 1;
+      for (let i = 0; i < pellets; i++) {
+        const spread = pellets > 1 ? (i - (pellets - 1) / 2) * 0.085 : (Math.random() - 0.5) * 0.02;
+        const angle = baseAngle + spread;
+        state.projectiles.push({
+          x: originX + Math.cos(angle) * 20,
+          y: originY + Math.sin(angle) * 20,
+          vx: Math.cos(angle) * w.projSpeed,
+          vy: Math.sin(angle) * w.projSpeed,
+          dmg: stats.dmg,
+          color: w.projColor,
+          splash: w.splash,
+          slow: w.slow,
+          pierce: w.pierce,
+          burn: w.id === "bunsen_thrower" ? Math.round(stats.dmg * 0.35) : 0,
+          hitSet: new Set(),
+          radius: w.id === "centrifuge_launcher" ? 8 : w.id === "crispr_railgun" ? 7 : 5
+        });
+      }
+    }
+
+    function damageZombie(z, amount, slowAmount = 0, burnDmg = 0) {
+      z.hp -= amount;
+      if (slowAmount > 0) {
+        z.slowFactor = Math.max(z.slowFactor, slowAmount);
+        z.slowTimer = 2.5;
+      }
+      if (burnDmg > 0) {
+        z.burnDmg = Math.max(z.burnDmg, burnDmg);
+        z.burnTimer = 3.0;
+      }
+
+      // Dachshund Commander spawns mini-hound minions when hit!
+      if (z.typeId === "hound" && z.hp > 0 && Math.random() < 0.14 && state.zombies.length < 28) {
+        const houndDef = ZOMBIE_TYPES.find(t => t.id === "hound");
+        spawnZombie(houndDef, z.x - 18, Math.min(330, Math.max(135, z.y + (Math.random() - 0.5) * 55)), true);
+        addFloatingText(z.x, z.y - 32, "🐕 Release the Dachshunds!", "#f87171");
+      }
+
+      if (z.hp <= 0 && !z.dead) {
+        z.dead = true;
+        state.money += z.reward;
+        state.kills++;
+        state.waveKilledZombies++;
+        sfx.playPop();
+        addFloatingText(z.x, z.y - 15, `+$${z.reward}`, "#fbbf24");
+        spawnParticles(z.x, z.y, z.ringColor, 12);
+      }
+    }
+
+    function spawnParticles(x, y, color, count = 8) {
+      for (let i = 0; i < count; i++) {
+        const ang = Math.random() * Math.PI * 2;
+        const spd = 30 + Math.random() * 110;
+        state.particles.push({
+          x, y,
+          vx: Math.cos(ang) * spd,
+          vy: Math.sin(ang) * spd,
+          color,
+          life: 0.35 + Math.random() * 0.25,
+          maxLife: 0.6,
+          size: 2.5 + Math.random() * 3.5
+        });
+      }
+    }
+
+    function addFloatingText(x, y, text, color = "#34d399") {
+      state.floatingTexts.push({ x, y, text, color, life: 1.0 });
+    }
+
+    /***********************************************************************
+     * 12. ACTIVE EMERGENCY LAB PROTOCOLS (SKILLS)
+     ***********************************************************************/
+    document.getElementById("skillAutoclave").addEventListener("click", () => {
+      sfx.init();
+      const cost = 75;
+      if (state.money < cost) {
+        addFloatingText(420, 220, "Need $75 NIH Cash!", "#f87171");
+        return;
+      }
+      state.money -= cost;
+      sfx.playUnlock();
+      const dmg = Math.round(140 * getGlobalWaveMultiplier());
+      state.zombies.forEach(z => {
+        z.x = Math.min(canvas.width - 20, z.x + 85);
+        damageZombie(z, dmg, 0.4, 25);
+      });
+      spawnParticles(320, 230, "#f97316", 35);
+      addFloatingText(420, 180, "♨️ 121°C AUTOCLAVE STEAM PURGE!", "#fb923c");
+      updateHUD();
+      renderShop();
+    });
+
+    document.getElementById("skillCaffeine").addEventListener("click", () => {
+      sfx.init();
+      const cost = 60;
+      if (state.money < cost) {
+        addFloatingText(420, 220, "Need $60 NIH Cash!", "#f87171");
+        return;
+      }
+      state.money -= cost;
+      state.caffeineTimer = 10.0;
+      sfx.playUnlock();
+      addFloatingText(240, 170, "☕ ESPRESSO OVERDRIVE (10s +75% FIRE RATE)!", "#fbbf24");
+      updateHUD();
+      renderShop();
+    });
+
+    document.getElementById("skillBleach").addEventListener("click", () => {
+      sfx.init();
+      const cost = 120;
+      if (state.money < cost) {
+        addFloatingText(420, 220, "Need $120 NIH Cash!", "#f87171");
+        return;
+      }
+      state.money -= cost;
+      sfx.playUnlock();
+      const dmg = Math.round(280 * getGlobalWaveMultiplier());
+      state.zombies.forEach(z => {
+        damageZombie(z, dmg, 0.75, 45);
+      });
+      spawnParticles(500, 230, "#22d3ee", 45);
+      addFloatingText(420, 150, "🧼 10% BLEACH DECONTAMINATION WAVE!", "#22d3ee");
+      updateHUD();
+      renderShop();
+    });
+
+    /***********************************************************************
+     * 13. MAIN SIMULATION UPDATE LOOP
+     ***********************************************************************/
+    let lastTime = performance.now();
+
+    function updateSimulation(rawDt) {
+      if (state.paused) return;
+      const dt = Math.min(0.05, rawDt) * state.simSpeed;
+
+      // Caffeine overdrive timer
+      if (state.caffeineTimer > 0) {
+        state.caffeineTimer = Math.max(0, state.caffeineTimer - dt);
+      }
+
+      // Passive Undergrad Repair Crew
+      const repairUpg = LAB_UPGRADES.find(u => u.id === "grad_student_repair");
+      if (repairUpg && repairUpg.level > 0 && state.labHp < state.labMaxHp) {
+        state.labHp = Math.min(state.labMaxHp, state.labHp + repairUpg.level * 3 * dt);
+      }
+
+      // Player weapon firing (manual hold or auto-fire toward cursor when wave is active)
+      state.fireCooldown = Math.max(0, state.fireCooldown - dt);
+      if ((state.mouseDown || (state.waveActive && state.zombies.length > 0)) && state.fireCooldown <= 0) {
+        // If mouse isn't pressed, auto-aim at closest zombie for effortless fun!
+        if (!state.mouseDown && state.zombies.length > 0) {
+          let closest = state.zombies[0];
+          for (const z of state.zombies) {
+            if (z.x < closest.x) closest = z;
+          }
+          state.mouseX = closest.x;
+          state.mouseY = closest.y;
+        }
+        firePlayerWeapon();
+      }
+
+      // Turret firing
+      TURRET_PADS.forEach(pad => {
+        if (!pad.turret) return;
+        pad.cooldown = Math.max(0, (pad.cooldown || 0) - dt);
+        if (pad.cooldown <= 0 && state.zombies.length > 0) {
+          const tDef = TURRETS_DATA.find(t => t.id === pad.turret);
+          const tStats = getTurretStats(tDef, pad.level);
+          // Find target in range
+          const inRange = state.zombies.filter(z => !z.dead && Math.hypot(z.x - pad.x, z.y - pad.y) <= tDef.range);
+          if (inRange.length > 0) {
+            inRange.sort((a, b) => a.x - b.x);
+            const primary = inRange[0];
+            pad.cooldown = 1 / tStats.rate;
+
+            if (tDef.chain > 1) {
+              // Chain lightning / UV / qPCR beam turret
+              sfx.playZap();
+              const targets = inRange.slice(0, tDef.chain);
+              let prevX = pad.x, prevY = pad.y;
+              targets.forEach(t => {
+                damageZombie(t, tStats.dmg, tDef.slow, 0);
+                state.lightningBeams.push({
+                  x1: prevX, y1: prevY, x2: t.x, y2: t.y,
+                  color: tDef.color, life: 0.14
+                });
+                prevX = t.x; prevY = t.y;
+              });
+            } else {
+              // Projectile turret
+              const ang = Math.atan2(primary.y - pad.y, primary.x - pad.x);
+              state.projectiles.push({
+                x: pad.x,
+                y: pad.y,
+                vx: Math.cos(ang) * 520,
+                vy: Math.sin(ang) * 520,
+                dmg: tStats.dmg,
+                color: tDef.color,
+                splash: tDef.splash,
+                slow: tDef.slow,
+                pierce: 1,
+                burn: 0,
+                hitSet: new Set(),
+                radius: 5
+              });
+            }
+          }
+        }
+      });
+
+      // Spawn queued zombies
+      if (state.waveActive && state.zombiesToSpawn.length > 0) {
+        state.spawnTimer -= dt;
+        if (state.spawnTimer <= 0) {
+          const nextZ = state.zombiesToSpawn.shift();
+          spawnZombie(nextZ);
+          state.spawnTimer = Math.max(0.38, 1.35 - state.wave * 0.04);
+        }
+      }
+
+      // Check yacht party aura
+      const hasYachtAura = state.zombies.some(z => z.typeId === "yachtParty" && !z.dead);
+      const stickyMult = getStickySlowMultiplier();
+      const moatUpg = LAB_UPGRADES.find(u => u.id === "uv_door_grid");
+
+      // Update Zombies
+      for (const z of state.zombies) {
+        if (z.dead) continue;
+        z.wobble += dt * 7;
+        if (z.quoteTimer > 0) z.quoteTimer = Math.max(0, z.quoteTimer - dt);
+
+        if (z.slowTimer > 0) {
+          z.slowTimer -= dt;
+          if (z.slowTimer <= 0) z.slowFactor = 0;
+        }
+        if (z.burnTimer > 0) {
+          z.burnTimer -= dt;
+          damageZombie(z, z.burnDmg * dt, 0, 0);
+        }
+        // Tropical Beach Terri regeneration
+        if (z.typeId === "beach" && z.hp < z.maxHp) {
+          z.hp = Math.min(z.maxHp, z.hp + 4 * dt);
+        }
+
+        const speedMult = (1 - z.slowFactor) * stickyMult * (hasYachtAura ? 1.2 : 1);
+        const barricadeX = 162;
+
+        if (z.x > barricadeX + z.radius) {
+          z.x -= z.speed * speedMult * dt;
+        } else {
+          // Attacking the Magic Johnson Lab Barricade!
+          const dmgToLab = z.damage * dt;
+          if (state.labShield > 0) {
+            state.labShield = Math.max(0, state.labShield - dmgToLab);
+          } else {
+            state.labHp = Math.max(0, state.labHp - dmgToLab);
+          }
+          // Autoclave Steam Moat retaliatory damage
+          if (moatUpg && moatUpg.level > 0) {
+            damageZombie(z, moatUpg.level * 35 * dt, 0.2, 0);
+          }
+          if (state.labHp <= 0) {
+            triggerGameOver(z.name);
+            return;
+          }
+        }
+      }
+
+      // Remove dead zombies
+      state.zombies = state.zombies.filter(z => !z.dead);
+
+      // Update Projectiles
+      for (let i = state.projectiles.length - 1; i >= 0; i--) {
+        const p = state.projectiles[i];
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+
+        // Check collision with zombies
+        let removeProj = false;
+        for (const z of state.zombies) {
+          if (z.dead || p.hitSet.has(z.uid)) continue;
+          const dist = Math.hypot(p.x - z.x, p.y - z.y);
+          if (dist <= z.radius + p.radius) {
+            p.hitSet.add(z.uid);
+            damageZombie(z, p.dmg, p.slow, p.burn);
+            spawnParticles(p.x, p.y, p.color, 5);
+
+            // Splash damage
+            if (p.splash > 0) {
+              for (const other of state.zombies) {
+                if (other.uid !== z.uid && !other.dead) {
+                  if (Math.hypot(other.x - p.x, other.y - p.y) <= p.splash) {
+                    damageZombie(other, Math.round(p.dmg * 0.65), p.slow, p.burn);
+                  }
+                }
+              }
+              spawnParticles(p.x, p.y, p.color, 10);
+            }
+
+            p.pierce--;
+            if (p.pierce <= 0) {
+              removeProj = true;
+              break;
+            }
+          }
+        }
+
+        if (removeProj || p.x < 0 || p.x > canvas.width + 50 || p.y < 0 || p.y > canvas.height) {
+          state.projectiles.splice(i, 1);
+        }
+      }
+
+      // Check Wave Completion
+      if (state.waveActive && state.zombiesToSpawn.length === 0 && state.zombies.length === 0) {
+        completeWave();
+      }
+
+      // Update Particles, Lightning & Floating Text
+      for (let i = state.particles.length - 1; i >= 0; i--) {
+        const pt = state.particles[i];
+        pt.x += pt.vx * dt;
+        pt.y += pt.vy * dt;
+        pt.life -= dt;
+        if (pt.life <= 0) state.particles.splice(i, 1);
+      }
+      for (let i = state.lightningBeams.length - 1; i >= 0; i--) {
+        state.lightningBeams[i].life -= dt;
+        if (state.lightningBeams[i].life <= 0) state.lightningBeams.splice(i, 1);
+      }
+      for (let i = state.floatingTexts.length - 1; i >= 0; i--) {
+        const ft = state.floatingTexts[i];
+        ft.y -= 28 * dt;
+        ft.life -= dt;
+        if (ft.life <= 0) state.floatingTexts.splice(i, 1);
+      }
+
+      updateHUD();
+    }
+
+    function completeWave() {
+      state.waveActive = false;
+      const waveBonus = Math.round((45 + state.wave * 18) * getGrantMultiplier());
+      state.money += waveBonus;
+      state.wave++;
+      sfx.playUnlock();
+      addFloatingText(420, 210, `🎉 WAVE CLEARED! +$${waveBonus} NIH Renewal Bonus!`, "#34d399");
+
+      // Check Milestone Unlocks for new wave
+      checkMilestoneUnlocks(state.wave);
+
+      updateHUD();
+      renderQuickWeapons();
+      renderShop();
+      renderMilestones();
+
+      if (state.autoWave) {
+        setTimeout(() => {
+          if (!state.waveActive && !state.paused && state.labHp > 0) startWave();
+        }, 900);
+      }
+    }
+
+    function checkMilestoneUnlocks(newWave) {
+      if (state.unlockedWavesShown.has(newWave)) return;
+      const unlockedWeps = WEAPONS_DATA.filter(w => w.unlockWave === newWave);
+      const unlockedTurrets = TURRETS_DATA.filter(t => t.unlockWave === newWave);
+
+      if (unlockedWeps.length > 0 || unlockedTurrets.length > 0) {
+        state.unlockedWavesShown.add(newWave);
+        const item = unlockedWeps[0] || unlockedTurrets[0];
+        const toast = document.getElementById("unlockToast");
+        document.getElementById("unlockToastIcon").textContent = item.icon;
+        document.getElementById("unlockToastTitle").textContent = `Wave ${newWave} Clearance: ${item.name}`;
+        document.getElementById("unlockToastDesc").textContent = `${item.desc} (+Global Lab Damage increased to +${Math.round((newWave - 1) * 8)}%)`;
+        toast.classList.remove("hidden");
+        setTimeout(() => toast.classList.add("hidden"), 6500);
+      }
+    }
+
+    function triggerGameOver(culpritName) {
+      state.waveActive = false;
+      state.paused = true;
+      document.getElementById("gameOverReason").textContent = `${culpritName} breached the biosafety barricade and audited the entire Magic Johnson Lab!`;
+      document.getElementById("goWave").textContent = `Wave ${state.wave}`;
+      document.getElementById("goKills").textContent = state.kills;
+      document.getElementById("gameOverModal").classList.remove("hidden");
+      document.getElementById("gameOverModal").classList.add("flex");
+    }
+
+    /***********************************************************************
+     * 14. CANVAS RENDERING (LAB FLOOR, BIOSAFETY BARRICADE, TURRETS, ZOMBIE TERRIS)
+     ***********************************************************************/
+    function drawArena() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // 1. Bond LSC Lab Corridor Background
+      ctx.fillStyle = "#09101d";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Top & Bottom Lab Bench Zones
+      ctx.fillStyle = "#111c2d";
+      ctx.fillRect(160, 0, canvas.width - 160, 118);
+      ctx.fillRect(160, 342, canvas.width - 160, 118);
+
+      // Central Linoleum Corridor Grid
+      const matUpg = LAB_UPGRADES.find(u => u.id === "sticky_mats");
+      ctx.fillStyle = (matUpg && matUpg.level > 0) ? "#0b2436" : "#0d1627";
+      ctx.fillRect(160, 118, canvas.width - 160, 224);
+
+      ctx.strokeStyle = (matUpg && matUpg.level > 0) ? "rgba(56, 189, 248, 0.16)" : "rgba(148, 163, 184, 0.08)";
+      ctx.lineWidth = 1;
+      for (let x = 160; x < canvas.width; x += 40) {
+        ctx.beginPath();
+        ctx.moveTo(x, 118);
+        ctx.lineTo(x, 342);
+        ctx.stroke();
+      }
+      for (let y = 118; y <= 342; y += 45) {
+        ctx.beginPath();
+        ctx.moveTo(160, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+      }
+
+      // Sticky Cleanroom Mat Visual Indicator
+      if (matUpg && matUpg.level > 0) {
+        ctx.fillStyle = "rgba(14, 165, 233, 0.15)";
+        ctx.fillRect(210, 128, canvas.width - 240, 204);
+        ctx.fillStyle = "rgba(56, 189, 248, 0.55)";
+        ctx.font = "bold 10px Inter";
+        ctx.fillText(`🟦 CLEANROOM TACKY MATS LVL ${matUpg.level} (-${matUpg.level * 6}% ZOMBIE SPEED)`, 225, 326);
+      }
+
+      // Hazard Caution Stripes along Corridor Edges
+      for (let x = 160; x < canvas.width; x += 28) {
+        ctx.fillStyle = (x / 28) % 2 === 0 ? "#eab308" : "#1e293b";
+        ctx.fillRect(x, 114, 14, 5);
+        ctx.fillRect(x, 341, 14, 5);
+      }
+
+      // 2. Magic Johnson Lab Base (Left Zone)
+      const grad = ctx.createLinearGradient(0, 0, 160, 0);
+      grad.addColorStop(0, "#042f2e");
+      grad.addColorStop(1, "#0f172a");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 160, canvas.height);
+
+      // Autoclave Steam Moat at Barricade
+      const moatUpg = LAB_UPGRADES.find(u => u.id === "uv_door_grid");
+      if (moatUpg && moatUpg.level > 0) {
+        ctx.fillStyle = "rgba(249, 115, 22, 0.22)";
+        ctx.fillRect(156, 118, 22, 224);
+      }
+
+      // Biosafety Cabinet Sash Barricade Wall
+      ctx.fillStyle = "#10b981";
+      ctx.fillRect(154, 0, 8, canvas.height);
+      if (state.labShield > 0) {
+        ctx.strokeStyle = "#22d3ee";
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(165, 115);
+        ctx.lineTo(165, 345);
+        ctx.stroke();
+      }
+
+      // Lab Equipment Decals on Left Side
+      ctx.fillStyle = "#34d399";
+      ctx.font = "900 12px Inter";
+      ctx.fillText("MAGIC JOHNSON", 16, 36);
+      ctx.fillText("VIROLOGY LAB", 16, 52);
+      ctx.fillStyle = "#94a3b8";
+      ctx.font = "600 10px JetBrains Mono";
+      ctx.fillText("BOND LSC • RM 471", 16, 68);
+
+      // Draw -80C Freezer & Incubator props inside safe zone
+      ctx.fillStyle = "#1e293b";
+      ctx.strokeStyle = "#334155";
+      ctx.lineWidth = 2;
+      ctx.fillRect(18, 92, 58, 95);
+      ctx.strokeRect(18, 92, 58, 95);
+      ctx.fillStyle = "#38bdf8";
+      ctx.font = "bold 9px JetBrains Mono";
+      ctx.fillText("-80°C", 32, 115);
+      ctx.fillText("FREEZER", 26, 127);
+
+      ctx.fillStyle = "#1e293b";
+      ctx.fillRect(18, 275, 58, 95);
+      ctx.strokeRect(18, 275, 58, 95);
+      ctx.fillStyle = "#10b981";
+      ctx.fillText("CO2 37°C", 24, 298);
+      ctx.fillText("INCUBATOR", 20, 310);
+
+      // 3. Draw Defender Character + Equipped Science Weapon at Barricade
+      const defX = 128, defY = 230;
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(defX, defY, 22, 0, Math.PI * 2);
+      ctx.fillStyle = "#059669";
+      ctx.fill();
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = "#a7f3d0";
+      ctx.stroke();
+      ctx.font = "20px Inter";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("🧑‍🔬", defX, defY);
+
+      // Aiming barrel toward cursor
+      const aimAng = Math.atan2(state.mouseY - defY, state.mouseX - defX);
+      ctx.translate(defX, defY);
+      ctx.rotate(aimAng);
+      ctx.fillStyle = "#34d399";
+      ctx.fillRect(14, -4, 22, 8);
+      ctx.restore();
+
+      // 4. Draw 6 Automated Turret Pads
+      TURRET_PADS.forEach((pad, idx) => {
+        const isSelected = state.selectedPadIndex === idx;
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(pad.x, pad.y, 26, 0, Math.PI * 2);
+        ctx.fillStyle = pad.turret ? "#0f172a" : "rgba(15, 23, 42, 0.75)";
+        ctx.fill();
+        ctx.lineWidth = isSelected ? 3 : 2;
+        ctx.strokeStyle = isSelected ? "#fbbf24" : (pad.turret ? "#10b981" : "#475569");
+        ctx.stroke();
+
+        if (pad.turret) {
+          const tDef = TURRETS_DATA.find(t => t.id === pad.turret);
+          ctx.font = "22px Inter";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(tDef.icon, pad.x, pad.y - 2);
+
+          // Level badge
+          ctx.fillStyle = "#064e3b";
+          ctx.fillRect(pad.x - 18, pad.y + 14, 36, 13);
+          ctx.fillStyle = "#6ee7b7";
+          ctx.font = "bold 9px JetBrains Mono";
+          ctx.fillText(`LVL ${pad.level}`, pad.x, pad.y + 21);
+        } else {
+          ctx.fillStyle = isSelected ? "#fbbf24" : "#64748b";
+          ctx.font = "bold 10px Inter";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(`PAD #${idx + 1}`, pad.x, pad.y - 4);
+          ctx.font = "9px Inter";
+          ctx.fillText(isSelected ? "[SELECTED]" : "Click", pad.x, pad.y + 8);
+        }
+        ctx.restore();
+      });
+
+      // 5. Draw Lightning / UV / Laser Beams
+      state.lightningBeams.forEach(b => {
+        ctx.save();
+        ctx.strokeStyle = b.color;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(b.x1, b.y1);
+        const midX = (b.x1 + b.x2) / 2 + (Math.random() - 0.5) * 14;
+        const midY = (b.y1 + b.y2) / 2 + (Math.random() - 0.5) * 14;
+        ctx.lineTo(midX, midY);
+        ctx.lineTo(b.x2, b.y2);
+        ctx.stroke();
+        ctx.restore();
+      });
+
+      // 6. Draw Projectiles
+      state.projectiles.forEach(p => {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 8;
+        ctx.restore();
+      });
+
+      // 7. Draw Zombie Terris (Using Actual Cropped Photo Avatars!)
+      state.zombies.forEach(z => {
+        ctx.save();
+        const bobY = Math.sin(z.wobble) * 3.5;
+        const drawX = z.x;
+        const drawY = z.y + bobY;
+
+        // Shadow
+        ctx.fillStyle = "rgba(0,0,0,0.45)";
+        ctx.beginPath();
+        ctx.ellipse(drawX, z.y + z.radius + 4, z.radius * 0.8, 6, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Circular Photo Avatar Clip
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(drawX, drawY, z.radius, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.clip();
+
+        const sprite = loadedSprites[z.spriteKey];
+        if (sprite && sprite.complete && sprite.naturalWidth > 0) {
+          ctx.drawImage(sprite, drawX - z.radius, drawY - z.radius, z.radius * 2, z.radius * 2);
+        } else {
+          ctx.fillStyle = "#334155";
+          ctx.fillRect(drawX - z.radius, drawY - z.radius, z.radius * 2, z.radius * 2);
+        }
+
+        // Subtle Zombie Bio-Tint Overlay when slowed or burned
+        if (z.slowTimer > 0) {
+          ctx.fillStyle = "rgba(34, 211, 238, 0.32)";
+          ctx.fillRect(drawX - z.radius, drawY - z.radius, z.radius * 2, z.radius * 2);
+        } else if (z.burnTimer > 0) {
+          ctx.fillStyle = "rgba(249, 115, 22, 0.32)";
+          ctx.fillRect(drawX - z.radius, drawY - z.radius, z.radius * 2, z.radius * 2);
+        } else {
+          ctx.fillStyle = "rgba(16, 185, 129, 0.14)";
+          ctx.fillRect(drawX - z.radius, drawY - z.radius, z.radius * 2, z.radius * 2);
+        }
+        ctx.restore();
+
+        // Glowing Strain Ring around Terri Photo
+        ctx.beginPath();
+        ctx.arc(drawX, drawY, z.radius, 0, Math.PI * 2);
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = z.ringColor;
+        ctx.stroke();
+
+        // Name & Health Bar
+        const barW = Math.max(42, z.radius * 2);
+        const barH = 5;
+        const barX = drawX - barW / 2;
+        const barY = drawY - z.radius - 11;
+        ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
+        ctx.fillRect(barX - 1, barY - 1, barW + 2, barH + 2);
+        const hpRatio = Math.max(0, z.hp / z.maxHp);
+        ctx.fillStyle = hpRatio > 0.5 ? "#10b981" : hpRatio > 0.25 ? "#f59e0b" : "#ef4444";
+        ctx.fillRect(barX, barY, barW * hpRatio, barH);
+
+        // Strain Label
+        ctx.fillStyle = "#e2e8f0";
+        ctx.font = "bold 9px Inter";
+        ctx.textAlign = "center";
+        ctx.fillText(z.name.replace(" Terri", ""), drawX, barY - 3);
+
+        // Funny Speech Bubble Quote
+        if (z.quoteTimer > 0) {
+          ctx.font = "bold 10px Inter";
+          const qW = ctx.measureText(z.quote).width + 12;
+          ctx.fillStyle = "rgba(255, 255, 255, 0.94)";
+          ctx.fillRect(drawX - qW / 2, barY - 24, qW, 16);
+          ctx.fillStyle = "#0f172a";
+          ctx.fillText(z.quote, drawX, barY - 13);
+        }
+        ctx.restore();
+      });
+
+      // 8. Draw Particles & Floating Combat Text
+      state.particles.forEach(pt => {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, pt.life / pt.maxLife);
+        ctx.fillStyle = pt.color;
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+
+      state.floatingTexts.forEach(ft => {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, ft.life);
+        ctx.font = "800 12px Inter";
+        ctx.fillStyle = ft.color;
+        ctx.textAlign = "center";
+        ctx.fillText(ft.text, ft.x, ft.y);
+        ctx.restore();
+      });
+    }
+
+    /***********************************************************************
+     * 15. UI RENDERERS (HUD, QUICK WEAPON BAR, SHOP TABS, CODEX, MILESTONES)
+     ***********************************************************************/
+    function updateHUD() {
+      document.getElementById("hudMoney").textContent = `$${Math.floor(state.money).toLocaleString()}`;
+      document.getElementById("hudWave").textContent = `LVL ${state.wave}`;
+      document.getElementById("hudWaveProg").textContent = state.waveActive
+        ? `(${state.waveKilledZombies}/${state.waveTotalZombies})`
+        : `(Ready)`;
+      document.getElementById("hudKills").textContent = state.kills;
+
+      const hpPct = Math.max(0, Math.min(100, (state.labHp / state.labMaxHp) * 100));
+      document.getElementById("hudHpText").textContent = `${Math.ceil(state.labHp)}/${state.labMaxHp}`;
+      document.getElementById("hudHpBar").style.width = `${hpPct}%`;
+
+      const shieldWrap = document.getElementById("hudShieldBarWrap");
+      if (state.labMaxShield > 0) {
+        shieldWrap.classList.remove("hidden");
+        const shPct = Math.max(0, Math.min(100, (state.labShield / state.labMaxShield) * 100));
+        document.getElementById("hudShieldBar").style.width = `${shPct}%`;
+      } else {
+        shieldWrap.classList.add("hidden");
+      }
+
+      const startBtn = document.getElementById("btnStartWave");
+      const startTxt = document.getElementById("btnStartWaveText");
+      if (state.waveActive) {
+        startTxt.textContent = `Wave ${state.wave} in Progress...`;
+        startBtn.classList.add("opacity-60");
+      } else {
+        startTxt.textContent = `Start Wave ${state.wave}`;
+        startBtn.classList.remove("opacity-60");
+      }
+
+      // Active weapon badge
+      const eq = WEAPONS_DATA.find(w => w.id === state.equippedWeaponId);
+      if (eq) {
+        const st = getWeaponStats(eq);
+        document.getElementById("activeWeaponIcon").textContent = eq.icon;
+        document.getElementById("activeWeaponName").textContent = `${eq.name} (Lv.${eq.level})`;
+        document.getElementById("activeWeaponStats").textContent = `DMG: ${st.dmg} • Rate: ${st.rate}/s • ${eq.sciencePerk}`;
+      }
+
+      document.getElementById("globalScalingBadge").textContent =
+        `Lab Tech Mastery: +${Math.round((state.wave - 1) * 8)}% All Weapon & Turret DMG`;
+    }
+
+    function renderQuickWeapons() {
+      const bar = document.getElementById("quickWeaponBar");
+      bar.innerHTML = "";
+      WEAPONS_DATA.forEach((w, idx) => {
+        const btn = document.createElement("button");
+        const isEq = state.equippedWeaponId === w.id;
+        const unlocked = state.wave >= w.unlockWave;
+        btn.className = `px-2 py-1 rounded-lg text-xs font-bold border transition flex items-center gap-1 shrink-0 cursor-pointer ${
+          isEq
+            ? "bg-emerald-500/25 border-emerald-400 text-emerald-200 shadow"
+            : w.owned
+            ? "bg-slate-800/90 border-slate-700 text-slate-300 hover:bg-slate-700"
+            : unlocked
+            ? "bg-amber-500/10 border-amber-500/40 text-amber-300/90"
+            : "bg-slate-900 border-slate-800 text-slate-600 cursor-not-allowed"
+        }`;
+        btn.innerHTML = `<span>${w.icon}</span><span class="hidden sm:inline">${w.name.split(" ")[0]}</span><span class="mono text-[10px] opacity-75">[${idx + 1}]</span>`;
+        btn.addEventListener("click", () => {
+          sfx.init();
+          if (w.owned) {
+            state.equippedWeaponId = w.id;
+            updateHUD();
+            renderQuickWeapons();
+            renderShop();
+          } else {
+            switchTab("weapons");
+          }
+        });
+        bar.appendChild(btn);
+      });
+    }
+
+    function renderMilestones() {
+      const container = document.getElementById("milestoneTrack");
+      container.innerHTML = "";
+      MILESTONES.slice(0, 8).forEach(m => {
+        const reached = state.wave >= m.wave;
+        const div = document.createElement("div");
+        div.className = `p-1.5 rounded-lg border flex items-center gap-1.5 ${
+          reached
+            ? "bg-emerald-950/50 border-emerald-500/40 text-emerald-200"
+            : "bg-slate-950/60 border-slate-800 text-slate-500"
+        }`;
+        div.innerHTML = `
+          <span class="text-base">${m.icon}</span>
+          <div class="leading-tight overflow-hidden">
+            <div class="font-bold text-[10px] truncate">${reached ? "✅" : "🔒"} Wave ${m.wave}</div>
+            <div class="text-[9px] truncate opacity-85">${m.title}</div>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function switchTab(tabName) {
+      state.selectedTab = tabName;
+      const tabs = [
+        { id: "weapons", btn: "tabBtnWeapons", sub: "Buy & upgrade 8 hilarious handheld science weapons! Press [1-8] or click to equip." },
+        { id: "turrets", btn: "tabBtnTurrets", sub: `Selected Bench Pad: #${state.selectedPadIndex + 1} (Click any Pad on the lab floor to switch).` },
+        { id: "lab", btn: "tabBtnLab", sub: "Fortify the Magic Johnson Lab with biosafety sashes, sticky mats & NIH grant multipliers!" }
+      ];
+      tabs.forEach(t => {
+        const el = document.getElementById(t.btn);
+        if (t.id === tabName) {
+          el.className = "py-2.5 px-2 text-center border-b-2 border-emerald-400 text-emerald-300 bg-emerald-500/10 transition cursor-pointer";
+          document.getElementById("shopSubheader").textContent = t.sub;
+        } else {
+          el.className = "py-2.5 px-2 text-center border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition cursor-pointer";
+        }
+      });
+      renderShop();
+    }
+
+    function renderShop() {
+      const list = document.getElementById("shopListContainer");
+      list.innerHTML = "";
+
+      if (state.selectedTab === "weapons") {
+        WEAPONS_DATA.forEach(w => {
+          const unlocked = state.wave >= w.unlockWave;
+          const stats = getWeaponStats(w);
+          const isEq = state.equippedWeaponId === w.id;
+
+          const card = document.createElement("div");
+          card.className = `p-2.5 rounded-xl border transition ${
+            isEq
+              ? "bg-emerald-950/35 border-emerald-500/60"
+              : unlocked
+              ? "bg-slate-950/80 border-slate-800 hover:border-slate-700"
+              : "bg-slate-950/40 border-slate-900 opacity-60"
+          }`;
+
+          let actionHtml = "";
+          if (!unlocked) {
+            actionHtml = `<span class="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-400 text-[11px] font-bold mono">🔒 Unlocks Wave ${w.unlockWave}</span>`;
+          } else if (!w.owned) {
+            const canBuy = state.money >= w.cost;
+            actionHtml = `<button data-buy-wep="${w.id}" class="px-3 py-1.5 rounded-lg font-bold text-xs cursor-pointer ${
+              canBuy ? "bg-amber-500 hover:bg-amber-400 text-slate-950" : "bg-slate-800 text-slate-500"
+            }">Buy $${w.cost}</button>`;
+          } else {
+            const canUpg = state.money >= stats.upgradeCost;
+            actionHtml = `
+              <div class="flex items-center gap-1.5">
+                <button data-equip-wep="${w.id}" class="px-2.5 py-1.5 rounded-lg font-bold text-xs cursor-pointer ${
+                  isEq ? "bg-emerald-500 text-slate-950" : "bg-slate-800 hover:bg-slate-700 text-slate-200"
+                }">${isEq ? "Equipped" : "Equip"}</button>
+                <button data-upg-wep="${w.id}" class="px-2.5 py-1.5 rounded-lg font-bold text-xs cursor-pointer ${
+                  canUpg ? "bg-cyan-500 hover:bg-cyan-400 text-slate-950" : "bg-slate-800 text-slate-500"
+                }">⬆️ Lv.${w.level + 1} ($${stats.upgradeCost})</button>
+              </div>
+            `;
+          }
+
+          card.innerHTML = `
+            <div class="flex items-start justify-between gap-2">
+              <div class="flex items-start gap-2">
+                <div class="text-2xl bg-slate-900 border border-slate-700 rounded-lg p-1.5">${w.icon}</div>
+                <div>
+                  <div class="font-bold text-xs sm:text-sm text-white flex items-center gap-1.5">
+                    <span>${w.name}</span>
+                    ${w.owned ? `<span class="text-[10px] mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300">Lv.${w.level}</span>` : ""}
+                  </div>
+                  <div class="text-[10px] font-semibold text-amber-300/90">${w.sciencePerk}</div>
+                </div>
+              </div>
+              ${actionHtml}
+            </div>
+            <p class="text-[11px] text-slate-400 mt-1.5 leading-snug">${w.desc}</p>
+            <div class="mt-2 pt-1.5 border-t border-slate-800/80 flex flex-wrap gap-3 text-[10px] mono text-slate-300">
+              <span>💥 DMG: <strong class="text-emerald-400">${stats.dmg}</strong></span>
+              <span>⚡ Rate: <strong class="text-cyan-400">${stats.rate}/s</strong></span>
+              <span>🎯 Pierce: <strong>${w.pierce}</strong></span>
+              ${w.pellets > 1 ? `<span>🧪 Tips: <strong>${w.pellets}x</strong></span>` : ""}
+              ${w.splash > 0 ? `<span>💣 AoE: <strong>${w.splash}px</strong></span>` : ""}
+            </div>
+          `;
+          list.appendChild(card);
+        });
+      } else if (state.selectedTab === "turrets") {
+        // Pad selector bar inside Turrets tab
+        const padBar = document.createElement("div");
+        padBar.className = "grid grid-cols-6 gap-1 mb-2";
+        TURRET_PADS.forEach((p, idx) => {
+          const b = document.createElement("button");
+          const active = state.selectedPadIndex === idx;
+          b.className = `py-1 rounded text-[10px] font-bold mono border cursor-pointer ${
+            active
+              ? "bg-amber-500 text-slate-950 border-amber-400"
+              : p.turret
+              ? "bg-emerald-950/60 text-emerald-300 border-emerald-500/40"
+              : "bg-slate-950 text-slate-400 border-slate-800"
+          }`;
+          b.textContent = `Pad #${idx + 1}`;
+          b.addEventListener("click", () => {
+            state.selectedPadIndex = idx;
+            switchTab("turrets");
+          });
+          padBar.appendChild(b);
+        });
+        list.appendChild(padBar);
+
+        const currentPad = TURRET_PADS[state.selectedPadIndex];
+        if (currentPad.turret) {
+          const installedDef = TURRETS_DATA.find(t => t.id === currentPad.turret);
+          const st = getTurretStats(installedDef, currentPad.level);
+          const canUpg = state.money >= st.upgradeCost;
+          const activeBox = document.createElement("div");
+          activeBox.className = "p-3 rounded-xl bg-emerald-950/40 border-2 border-emerald-500/60 mb-2";
+          activeBox.innerHTML = `
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="text-2xl">${installedDef.icon}</span>
+                <div>
+                  <div class="text-xs font-bold text-emerald-300 uppercase">Installed on Pad #${state.selectedPadIndex + 1}</div>
+                  <div class="font-black text-sm text-white">${installedDef.name} (Lv.${currentPad.level})</div>
+                </div>
+              </div>
+              <button data-upg-pad="${state.selectedPadIndex}" class="px-3 py-1.5 rounded-lg font-bold text-xs cursor-pointer ${
+                canUpg ? "bg-amber-500 hover:bg-amber-400 text-slate-950" : "bg-slate-800 text-slate-500"
+              }">⬆️ Upgrade ($${st.upgradeCost})</button>
+            </div>
+            <div class="mt-2 flex gap-4 text-[11px] mono text-slate-300">
+              <span>💥 DMG: <strong class="text-emerald-400">${st.dmg}</strong></span>
+              <span>⚡ Rate: <strong class="text-cyan-400">${st.rate}/s</strong></span>
+              <span>📡 Range: <strong>${installedDef.range}px</strong></span>
+            </div>
+          `;
+          list.appendChild(activeBox);
+        }
+
+        TURRETS_DATA.forEach(t => {
+          const unlocked = state.wave >= t.unlockWave;
+          const st = getTurretStats(t, 1);
+          const canBuy = state.money >= t.cost;
+
+          const card = document.createElement("div");
+          card.className = `p-2.5 rounded-xl border bg-slate-950/80 border-slate-800 ${!unlocked ? "opacity-60" : ""}`;
+          card.innerHTML = `
+            <div class="flex items-start justify-between gap-2">
+              <div class="flex items-start gap-2">
+                <div class="text-2xl bg-slate-900 border border-slate-700 rounded-lg p-1.5">${t.icon}</div>
+                <div>
+                  <div class="font-bold text-xs sm:text-sm text-white">${t.name}</div>
+                  <div class="text-[10px] mono text-cyan-300">DMG: ${st.dmg} • Rate: ${st.rate}/s • Targets: ${t.chain}</div>
+                </div>
+              </div>
+              ${
+                !unlocked
+                  ? `<span class="px-2 py-1 rounded bg-slate-800 text-slate-400 text-[10px] font-bold mono">🔒 Wave ${t.unlockWave}</span>`
+                  : `<button data-build-turret="${t.id}" class="px-2.5 py-1.5 rounded-lg font-bold text-xs cursor-pointer ${
+                      canBuy ? "bg-emerald-500 hover:bg-emerald-400 text-slate-950" : "bg-slate-800 text-slate-500"
+                    }">${currentPad.turret ? "Replace" : "Build"} $${t.cost}</button>`
+              }
+            </div>
+            <p class="text-[11px] text-slate-400 mt-1.5 leading-snug">${t.desc}</p>
+          `;
+          list.appendChild(card);
+        });
+      } else if (state.selectedTab === "lab") {
+        LAB_UPGRADES.forEach(u => {
+          const cost = getLabUpgradeCost(u);
+          const maxed = u.level >= u.maxLevel;
+          const canBuy = !maxed && state.money >= cost;
+
+          const card = document.createElement("div");
+          card.className = "p-2.5 rounded-xl border bg-slate-950/80 border-slate-800";
+          card.innerHTML = `
+            <div class="flex items-start justify-between gap-2">
+              <div class="flex items-start gap-2">
+                <div class="text-2xl bg-slate-900 border border-slate-700 rounded-lg p-1.5">${u.icon}</div>
+                <div>
+                  <div class="font-bold text-xs sm:text-sm text-white">${u.name}</div>
+                  <div class="text-[10px] mono text-emerald-400">Level ${u.level} / ${u.maxLevel}</div>
+                </div>
+              </div>
+              <button data-buy-lab="${u.id}" class="px-3 py-1.5 rounded-lg font-bold text-xs cursor-pointer ${
+                maxed
+                  ? "bg-slate-800 text-emerald-400 cursor-default"
+                  : canBuy
+                  ? "bg-amber-500 hover:bg-amber-400 text-slate-950"
+                  : "bg-slate-800 text-slate-500"
+              }">${maxed ? "MAXED" : `Upgrade $${cost}`}</button>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-1.5 leading-snug">${u.desc}</p>
+          `;
+          list.appendChild(card);
+        });
+      }
+    }
+
+    // Event delegation for Shop buttons
+    document.getElementById("shopListContainer").addEventListener("click", (e) => {
+      const buyWepId = e.target.getAttribute("data-buy-wep");
+      if (buyWepId) {
+        sfx.init();
+        const w = WEAPONS_DATA.find(item => item.id === buyWepId);
+        if (w && state.money >= w.cost) {
+          state.money -= w.cost;
+          w.owned = true;
+          w.level = 1;
+          state.equippedWeaponId = w.id;
+          sfx.playUnlock();
+          updateHUD();
+          renderQuickWeapons();
+          renderShop();
+        }
+        return;
+      }
+
+      const eqWepId = e.target.getAttribute("data-equip-wep");
+      if (eqWepId) {
+        sfx.init();
+        state.equippedWeaponId = eqWepId;
+        sfx.playPop();
+        updateHUD();
+        renderQuickWeapons();
+        renderShop();
+        return;
+      }
+
+      const upgWepId = e.target.getAttribute("data-upg-wep");
+      if (upgWepId) {
+        sfx.init();
+        const w = WEAPONS_DATA.find(item => item.id === upgWepId);
+        const st = getWeaponStats(w);
+        if (w && state.money >= st.upgradeCost) {
+          state.money -= st.upgradeCost;
+          w.level++;
+          sfx.playPop();
+          addFloatingText(160, 200, `⬆️ ${w.name} Lv.${w.level}!`, "#38bdf8");
+          updateHUD();
+          renderQuickWeapons();
+          renderShop();
+        }
+        return;
+      }
+
+      const buildTurretId = e.target.getAttribute("data-build-turret");
+      if (buildTurretId) {
+        sfx.init();
+        const tDef = TURRETS_DATA.find(t => t.id === buildTurretId);
+        const pad = TURRET_PADS[state.selectedPadIndex];
+        if (tDef && state.money >= tDef.cost) {
+          state.money -= tDef.cost;
+          pad.turret = tDef.id;
+          pad.level = 1;
+          pad.cooldown = 0;
+          sfx.playUnlock();
+          spawnParticles(pad.x, pad.y, tDef.color, 16);
+          addFloatingText(pad.x, pad.y - 20, `Built ${tDef.name}!`, "#34d399");
+          // Advance to next empty pad automatically if one exists
+          const emptyIdx = TURRET_PADS.findIndex(p => !p.turret);
+          if (emptyIdx !== -1) state.selectedPadIndex = emptyIdx;
+          updateHUD();
+          renderShop();
+        }
+        return;
+      }
+
+      const upgPadIdx = e.target.getAttribute("data-upg-pad");
+      if (upgPadIdx !== null && upgPadIdx !== undefined) {
+        sfx.init();
+        const pad = TURRET_PADS[Number(upgPadIdx)];
+        if (pad && pad.turret) {
+          const tDef = TURRETS_DATA.find(t => t.id === pad.turret);
+          const st = getTurretStats(tDef, pad.level);
+          if (state.money >= st.upgradeCost) {
+            state.money -= st.upgradeCost;
+            pad.level++;
+            sfx.playPop();
+            spawnParticles(pad.x, pad.y, "#fbbf24", 12);
+            addFloatingText(pad.x, pad.y - 20, `⬆️ Turret Lv.${pad.level}!`, "#fbbf24");
+            updateHUD();
+            renderShop();
+          }
+        }
+        return;
+      }
+
+      const buyLabId = e.target.getAttribute("data-buy-lab");
+      if (buyLabId) {
+        sfx.init();
+        const u = LAB_UPGRADES.find(item => item.id === buyLabId);
+        const cost = getLabUpgradeCost(u);
+        if (u && u.level < u.maxLevel && state.money >= cost) {
+          state.money -= cost;
+          u.level++;
+          sfx.playPop();
+          if (u.id === "polycarbonate_sash") {
+            state.labMaxHp += 45;
+            state.labHp = Math.min(state.labMaxHp, state.labHp + 45);
+          } else if (u.id === "hepa_curtain") {
+            state.labMaxShield += 35;
+            state.labShield += 35;
+          }
+          addFloatingText(160, 160, `🏰 ${u.name} Lv.${u.level}!`, "#34d399");
+          updateHUD();
+          renderShop();
+        }
+      }
+    });
+
+    /***********************************************************************
+     * 16. RENDER ZOMBIE TERRI STRAIN CODEX MODAL
+     ***********************************************************************/
+    function renderCodex() {
+      const grid = document.getElementById("codexGrid");
+      grid.innerHTML = "";
+      ZOMBIE_TYPES.forEach(z => {
+        const card = document.createElement("div");
+        card.className = "bg-slate-950 border border-slate-800 rounded-xl p-3 flex items-center gap-3";
+        card.innerHTML = `
+          <img src="${TERRI_SPRITE_PATHS[z.spriteKey]}" alt="${z.name}" class="w-20 h-20 rounded-full object-cover border-2 shrink-0" style="border-color: ${z.ringColor}" />
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between gap-1">
+              <span class="font-bold text-sm text-white truncate">${z.name}</span>
+              <span class="text-[10px] mono px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 shrink-0">Wave ${z.minWave}+</span>
+            </div>
+            <div class="text-[11px] font-semibold text-amber-300">${z.subtitle}</div>
+            <p class="text-[11px] text-slate-400 mt-1">${z.trait}</p>
+            <div class="mt-1.5 flex gap-3 text-[10px] mono text-slate-300">
+              <span>❤️ Base HP: ${z.hp}</span>
+              <span>🏃 Speed: ${z.speed}</span>
+              <span>💰 Grant Drop: $${z.reward}</span>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    /***********************************************************************
+     * 17. INPUT LISTENERS (CANVAS POINTER, TABS, HEADER BUTTONS, KEYBOARD)
+     ***********************************************************************/
+    function updatePointerCoords(e) {
+      const rect = canvas.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const x = (clientX - rect.left) * (canvas.width / rect.width);
+      const y = (clientY - rect.top) * (canvas.height / rect.height);
+      state.mouseX = x;
+      state.mouseY = y;
+      return { x, y };
+    }
+
+    canvas.addEventListener("mousedown", (e) => {
+      sfx.init();
+      const { x, y } = updatePointerCoords(e);
+      // Check if user clicked on a Turret Pad
+      for (let i = 0; i < TURRET_PADS.length; i++) {
+        const p = TURRET_PADS[i];
+        if (Math.hypot(x - p.x, y - p.y) <= 28) {
+          state.selectedPadIndex = i;
+          switchTab("turrets");
+          return;
+        }
+      }
+      state.mouseDown = true;
+    });
+
+    canvas.addEventListener("mousemove", (e) => {
+      updatePointerCoords(e);
+    });
+    window.addEventListener("mouseup", () => {
+      state.mouseDown = false;
+    });
+
+    canvas.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      sfx.init();
+      const { x, y } = updatePointerCoords(e);
+      for (let i = 0; i < TURRET_PADS.length; i++) {
+        const p = TURRET_PADS[i];
+        if (Math.hypot(x - p.x, y - p.y) <= 30) {
+          state.selectedPadIndex = i;
+          switchTab("turrets");
+          return;
+        }
+      }
+      state.mouseDown = true;
+    }, { passive: false });
+
+    canvas.addEventListener("touchmove", (e) => {
+      e.preventDefault();
+      updatePointerCoords(e);
+    }, { passive: false });
+
+    canvas.addEventListener("touchend", () => {
+      state.mouseDown = false;
+    });
+
+    // Keyboard shortcuts [1-8] for weapons, Space to start wave
+    window.addEventListener("keydown", (e) => {
+      if (e.key >= "1" && e.key <= "8") {
+        const idx = Number(e.key) - 1;
+        const w = WEAPONS_DATA[idx];
+        if (w && w.owned) {
+          state.equippedWeaponId = w.id;
+          updateHUD();
+          renderQuickWeapons();
+          renderShop();
+        }
+      } else if (e.code === "Space") {
+        if (!state.waveActive && !state.paused) startWave();
+      }
+    });
+
+    // Header Controls
+    document.getElementById("btnStartWave").addEventListener("click", () => startWave());
+
+    document.getElementById("btnAutoWave").addEventListener("click", (e) => {
+      state.autoWave = !state.autoWave;
+      e.currentTarget.textContent = `Auto: ${state.autoWave ? "ON" : "OFF"}`;
+      e.currentTarget.className = state.autoWave
+        ? "px-2.5 py-1.5 rounded-lg font-semibold text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 transition cursor-pointer"
+        : "px-2.5 py-1.5 rounded-lg font-semibold text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition cursor-pointer";
+      if (state.autoWave && !state.waveActive) startWave();
+    });
+
+    document.getElementById("btnSpeed").addEventListener("click", (e) => {
+      state.simSpeed = state.simSpeed === 1 ? 2 : state.simSpeed === 2 ? 3 : 1;
+      e.currentTarget.textContent = `${state.simSpeed}x`;
+    });
+
+    document.getElementById("btnPause").addEventListener("click", (e) => {
+      state.paused = !state.paused;
+      e.currentTarget.textContent = state.paused ? "▶️" : "⏸️";
+    });
+
+    document.getElementById("btnMute").addEventListener("click", (e) => {
+      sfx.muted = !sfx.muted;
+      e.currentTarget.textContent = sfx.muted ? "🔇" : "🔊";
+    });
+
+    document.getElementById("btnCodex").addEventListener("click", () => {
+      renderCodex();
+      const m = document.getElementById("codexModal");
+      m.classList.remove("hidden");
+      m.classList.add("flex");
+    });
+
+    document.getElementById("btnCloseCodex").addEventListener("click", () => {
+      const m = document.getElementById("codexModal");
+      m.classList.add("hidden");
+      m.classList.remove("flex");
+    });
+
+    document.getElementById("btnCloseToast").addEventListener("click", () => {
+      document.getElementById("unlockToast").classList.add("hidden");
+    });
+
+    document.getElementById("tabBtnWeapons").addEventListener("click", () => switchTab("weapons"));
+    document.getElementById("tabBtnTurrets").addEventListener("click", () => switchTab("turrets"));
+    document.getElementById("tabBtnLab").addEventListener("click", () => switchTab("lab"));
+
+    // Game Over Modal Buttons
+    document.getElementById("btnRetryWave").addEventListener("click", () => {
+      state.labHp = state.labMaxHp;
+      state.labShield = state.labMaxShield;
+      state.zombies = [];
+      state.projectiles = [];
+      state.zombiesToSpawn = [];
+      state.waveActive = false;
+      state.paused = false;
+      document.getElementById("gameOverModal").classList.add("hidden");
+      document.getElementById("gameOverModal").classList.remove("flex");
+      updateHUD();
+    });
+
+    document.getElementById("btnRestartGame").addEventListener("click", () => {
+      window.location.reload();
+    });
+
+    /***********************************************************************
+     * 18. BOOTSTRAP GAME LOOP ON WINDOW LOAD
+     ***********************************************************************/
+    function gameLoop(now) {
+      const dt = (now - lastTime) / 1000;
+      lastTime = now;
+      updateSimulation(dt);
+      drawArena();
+      requestAnimationFrame(gameLoop);
+    }
+
+    window.onload = () => {
+      updateHUD();
+      renderQuickWeapons();
+      renderMilestones();
+      renderShop();
+      renderCodex();
+      requestAnimationFrame(gameLoop);
+    };
+  </script>
+</body>
+</html>
